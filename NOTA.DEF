@@ -1,0 +1,116 @@
+DEFINITION MODULE Nota;
+
+FROM EMany IMPORT EditMany, KBD;
+
+(*# data( packed => on ) *)
+TYPE NotaType  = [ 0..1099 ];
+
+CONST NullNota     = MAX( NotaType ) - 0;
+      Ausente      = MAX( NotaType ) - 1;
+      Cero         = MAX( NotaType ) - 2;
+      Equivalencia = MAX( NotaType ) - 3;
+      Aprobado     = MAX( NotaType ) - 4;
+      Desaprobado  = MAX( NotaType ) - 5;
+      Promocion    = MAX( NotaType ) - 6;
+
+CONST MinNota =  NotaType(  400 );
+      MaxNota =  NotaType( 1000 );
+
+VAR Separador :CHAR;  (* por defecto = '.' *)
+
+PROCEDURE Aprob( n :NotaType ) :BOOLEAN;
+(*
+   Determina si una nota est  aprobada o no.
+*)
+
+PROCEDURE DesAprob( n :NotaType ) :BOOLEAN;
+(*
+   Determina si una nota est  desaprobada o no.
+*)
+
+PROCEDURE Promedio( parc1, parc2 :NotaType ) :NotaType;
+(*
+   Devuelve el valor promedio de 2 notas.
+*)
+
+PROCEDURE Inc( VAR total :LONGCARD; n2 :NotaType ) :BOOLEAN;
+(*
+   Incrementa la suma de "total" en la nota "n2".
+*)
+
+PROCEDURE Max( n1, n2 :NotaType ) :NotaType;
+(*
+   Devuelve el m ximo entre n1 y n2.
+*)
+
+PROCEDURE Less( n1, n2 :NotaType ) :BOOLEAN;
+
+TYPE ptrNota = POINTER TO NotaClass;
+CLASS NotaClass( EditMany );
+    nota :NotaType;
+    PROCEDURE Init( x, y :CARDINAL; gMsg :ARRAY OF CHAR; gNota :NotaType );
+    VIRTUAL PROCEDURE Write();
+    VIRTUAL PROCEDURE Edit() :KBD.KeyType;
+    PROCEDURE Retrieve( VAR gNota :NotaType );
+END NotaClass;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos sobre el tipo "Nota".                                     *)
+(*     Escritura.                                                           *)
+(*     Escritura XY.                                                        *)
+(*     Escritura XY con Mensaje.                                            *)
+(*     Dado un Valor devolver un "string" con                               *)
+(*              el valor del Valor en Castellano.                           *)
+(*     Dado un Valor con el largo que lo presisamos lo convierte a "String".*)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE WrNota( p :NotaType; long :CARDINAL );
+PROCEDURE WrNotaAt( x, y :CARDINAL; p :NotaType; long :CARDINAL );
+(*
+   Escritura de un "Nota" con longitud : "long".
+   en "x, y".
+*)
+
+PROCEDURE WrNotaFix( p :NotaType );
+PROCEDURE WrNotaFixAt( x, y :CARDINAL; p :NotaType );
+(*
+   Escritura de un "Nota" con longitud : "long"; solo la parte entera.
+   en "x, y".
+*)
+
+PROCEDURE PrNota( p :NotaType; long :CARDINAL );
+PROCEDURE PrNotaFix( p :NotaType );
+(*
+   Imprime (saca por el "PrntIO" la nota especificada.
+*)
+
+PROCEDURE NotaToEnLetras( n :NotaType; long :INTEGER; VAR str :ARRAY OF CHAR );
+PROCEDURE WrEnLetras( n :NotaType; long :INTEGER );
+PROCEDURE PrEnLetras( n :NotaType; long :INTEGER );
+(*
+   Imprime o escribe una nota en el formato:
+           <nota en letras>,<decimales>
+*)
+
+PROCEDURE ValorStr( p :NotaType; VAR ValorStr :ARRAY OF CHAR );
+(*
+   Pasa un Valor de su formato original a un "string" en "Castellano".
+*)
+
+PROCEDURE ValorStrFix( n :NotaType; VAR letras :ARRAY OF CHAR );
+(*
+   Pasa una nota en su formato binario a un string en "Castellano".
+   Sin tener en cuenta sus decimales.
+*)
+
+PROCEDURE ValorVal( p :NotaType; long :CARDINAL; VAR ValorVal :ARRAY OF CHAR );
+(*
+   Pasa un Valor de su formato original a un "string" de tama¤o : "long".
+*)
+
+PROCEDURE ValorValFix( p :NotaType; VAR montoVal :ARRAY OF CHAR );
+(*
+   Pasa un monto de su formato original a un "string" de tama¤o : "long".
+*)
+
+END Nota.

@@ -1,0 +1,13 @@
+DEFINITION MODULE ExCurrent;
+
+PROCEDURE Load();
+PROCEDURE New();
+PROCEDURE CopyAs();
+
+PROCEDURE Edit();
+
+PROCEDURE Correo();
+
+PROCEDURE WebX();
+
+END ExCurrent.

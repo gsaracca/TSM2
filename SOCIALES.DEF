@@ -1,0 +1,28 @@
+DEFINITION MODULE Sociales;
+
+IMPORT ClassCarreras, TM;
+IMPORT DateTime;
+
+TYPE ptrSocialesClass = POINTER TO SocialesClass;
+CLASS SocialesClass( ClassCarreras.CarreraClass );
+    VIRTUAL PROCEDURE IngresoCursada(     plan  :TM.YearType;
+                                          clave :TM.KeyType;
+                                      VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    VIRTUAL PROCEDURE IngresoFinal(     plan  :TM.YearType;
+                                        mate  :TM.NumeroType;
+                                        fecha :DateTime.DateType;
+                                    VAR mates :TM.MateriasType ) :BOOLEAN;
+END SocialesClass;
+
+VAR pCarrera :ptrSocialesClass;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos generales para PROCTOOLS.                                 *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetConvertProcs(     i    :CARDINAL;
+                           VAR disp :ARRAY OF CHAR;
+                           VAR proc :TM.ProcType   ) :BOOLEAN;
+
+END Sociales.

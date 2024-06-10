@@ -1,0 +1,62 @@
+DEFINITION MODULE ClassCarreras;
+
+IMPORT TM;
+IMPORT DateTime;
+
+TYPE ptrCarreraClass = POINTER TO CarreraClass;
+CLASS CarreraClass;
+
+    Carrera :TM.CarreraType;
+
+    PROCEDURE Al_menos_finales( VAR mates :TM.MateriasType;
+                                    conj  :TM.ConjMaterias;
+                                    num   :CARDINAL ) :BOOLEAN;
+
+    PROCEDURE Al_menos_cursadas( VAR mates :TM.MateriasType;
+                                     conj  :TM.ConjMaterias;
+                                     num   :CARDINAL ) :BOOLEAN;
+
+    PROCEDURE CountFinales( VAR mates :TM.MateriasType;
+                                ctrl  :CARDINAL ) :BOOLEAN;
+
+    PROCEDURE CountActivas( VAR mates :TM.MateriasType;
+                                ctrl  :CARDINAL;
+                                fecha :DateTime.DateType ) :BOOLEAN;
+
+    PROCEDURE CountAprobadosExepto( VAR mates :TM.MateriasType;
+                                        conj  :TM.ConjMaterias;
+                                        num   :CARDINAL ) :BOOLEAN;
+
+    PROCEDURE CountRegulares( VAR mates :TM.MateriasType;
+                                  conj  :TM.ConjMaterias;
+                                  ctrl  :CARDINAL ) :BOOLEAN;
+
+
+    PROCEDURE CtrlPorcentaje( VAR mates   :TM.MateriasType;
+                                  Corr    :TM.ConjMaterias;
+                                  percent :LONGCARD ) :BOOLEAN;
+
+    PROCEDURE CtrlCursada( VAR mates :TM.MateriasType;
+                               Corr  :TM.ConjMaterias ) :BOOLEAN;
+
+    PROCEDURE CtrlFinal( VAR mates :TM.MateriasType;
+                             Corr  :TM.ConjMaterias ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Control general para la Facultad  .                                      *)
+(* ------------------------------------------------------------------------ *)
+
+    VIRTUAL PROCEDURE CtrlGeneral( VAR alum :TM.AlumType ) :BOOLEAN;
+
+    VIRTUAL PROCEDURE IngresoCursada(     plan  :TM.YearType;
+                                          clave :TM.KeyType;
+                                      VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    VIRTUAL PROCEDURE IngresoFinal(     plan  :TM.YearType;
+                                        mate  :TM.NumeroType;
+                                        fecha :DateTime.DateType;
+                                    VAR mates :TM.MateriasType ) :BOOLEAN;
+
+END CarreraClass;
+
+END ClassCarreras.

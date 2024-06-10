@@ -1,0 +1,201 @@
+DEFINITION MODULE Common;
+
+IMPORT TM, DateTime, GTab;
+
+CONST disk_full_msg = '¯ Insuficiente espacio libre en el disco ®';
+
+TYPE CommonStr = ARRAY [ 0..135 ] OF CHAR;
+
+PROCEDURE Ver()              :CommonStr;  (* N£mero de la versi¢n actual *)
+PROCEDURE Release()          :CommonStr;  (* N£mero del Release          *)
+PROCEDURE DateVer()          :CommonStr;  (* Fecha de la versi¢n actual  *)
+PROCEDURE DateRelease()      :CommonStr;  (* Fecha del Release           *)
+PROCEDURE FacultadStr()      :CommonStr;
+PROCEDURE FacultadStrUpper() :CommonStr;
+PROCEDURE FacultadStrLower() :CommonStr;
+PROCEDURE LicNum()           :CommonStr;
+
+(* ------------------------------------------------------------------------ *)
+(* Lineas del listador de pantalla                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Linea_1()   :CommonStr;
+PROCEDURE Linea_2()   :CommonStr;
+PROCEDURE Linea_3()   :CommonStr;
+PROCEDURE Linea_4()   :CommonStr;
+PROCEDURE UpperLine() :CommonStr;
+PROCEDURE Grid()      :CommonStr;
+PROCEDURE NullGrid()  :CommonStr;
+
+(* ------------------------------------------------------------------------ *)
+(* Lineas del Primer listado de la ficha personal.                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Prn1_Linea_1()   :CommonStr;
+PROCEDURE Prn1_Linea_2()   :CommonStr;
+PROCEDURE Prn1_Linea_3()   :CommonStr;
+PROCEDURE Prn1_Linea_4()   :CommonStr;
+PROCEDURE Prn1_UpperLine() :CommonStr;
+PROCEDURE Prn1_Linea_6()   :CommonStr;
+
+(* ------------------------------------------------------------------------ *)
+(* Lineas del Segundo listado de la ficha personal.                         *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Prn2_Linea_1()   :CommonStr;
+PROCEDURE Prn2_Linea_2()   :CommonStr;
+PROCEDURE Prn2_Linea_3()   :CommonStr;
+PROCEDURE Prn2_Linea_4()   :CommonStr;
+PROCEDURE Prn2_UpperLine() :CommonStr;
+PROCEDURE Prn2_Linea_6()    :CommonStr;
+
+(* ------------------------------------------------------------------------ *)
+(* Lineas de la Ficha Personal.                                             *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Prn3_Linea_1()   :CommonStr;
+PROCEDURE Prn3_Linea_2()   :CommonStr;
+PROCEDURE Prn3_Linea_3()   :CommonStr;
+PROCEDURE Prn3_Linea_4()   :CommonStr;
+PROCEDURE Prn3_UpperLine() :CommonStr;
+PROCEDURE Prn3_Linea_6()   :CommonStr;
+
+(* ------------------------------------------------------------------------ *)
+(* Otras                                                                    *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Ciudad( VAR city :ARRAY OF CHAR );
+
+(*
+   Procedimientos y constantes globales a la UNICEN.
+*)
+
+CONST UniversidadStr1 = ' UNIVERSIDAD NACIONAL DEL CENTRO';
+      UniversidadStr2 = ' DE LA PROVINCIA DE BUENOS AIRES';
+
+PROCEDURE PrintTitulo();
+(*
+   Imprime el t¡tulo complete de la Universidad y luego la Facultad.
+*)
+
+PROCEDURE Init( str :ARRAY OF CHAR );
+PROCEDURE WrProg( str :ARRAY OF CHAR );
+PROCEDURE WrMsg( str :ARRAY OF CHAR );
+PROCEDURE Done();
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Nuevas impresiones standard de Cursadas y finales para las fichas.       *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetMaxMatePrint() :INTEGER;
+
+PROCEDURE WrLine();
+PROCEDURE PrLine();
+
+PROCEDURE WrCursada( cur :TM.CursadaType );
+PROCEDURE PrCursada( cur :TM.CursadaType );
+
+PROCEDURE WrFinales( mate :TM.MateriaType );
+PROCEDURE PrFinales( mate :TM.MateriaType );
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Nuevas impresiones standard de Cursadas para las Fichas II.              *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE PrFullCursada( cur :TM.CursadaType );
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Variables Globales para ACTUAL.MOD.                                      *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE LT = ARRAY TM.RangoLibros OF GTab.datoStr;
+
+PROCEDURE GetMateLenView() :INTEGER;
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Edici¢n de cursadas y finales en general.                                *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE EdCursada( VAR cur :TM.CursadaType ) :BOOLEAN;
+PROCEDURE EdFinal( VAR fin :TM.FinalType; fi :TM.RangoFinales;
+                   VAR libroStr :LT ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Impresi¢n del t¡tulo para el profesor.                                   *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetLP_MaxViewMate() :INTEGER;
+
+PROCEDURE GetLP_Top()    :CommonStr;
+PROCEDURE GetLP_Title1() :CommonStr;
+PROCEDURE GetLP_Title2() :CommonStr;
+PROCEDURE GetLP_Button() :CommonStr;
+
+PROCEDURE LP_PrLine( datpers :TM.AlumFileType; condicional :BOOLEAN );
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Constantes del T¡tulo.                                                   *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetObserv1( VAR ob1 :ARRAY OF CHAR );
+PROCEDURE GetObserv2( VAR ob2 :ARRAY OF CHAR );
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Constantes de las Variables Globales del Programa.                       *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GL_Facultad_En_Titulo() :BOOLEAN;
+PROCEDURE GL_Check_Hora()         :BOOLEAN;
+PROCEDURE GL_Cant_Mates_Hoja_1()  :CARDINAL;
+PROCEDURE GL_Cant_Mates_Hoja_2()  :CARDINAL;
+PROCEDURE GL_Head_Hoja_1()        :CARDINAL;
+PROCEDURE GL_Head_Hoja_2()        :CARDINAL;
+PROCEDURE GL_Ver_Observaciones()  :BOOLEAN;
+PROCEDURE GL_HF_En_L_Profesor()   :BOOLEAN;
+PROCEDURE GL_Pedir_Permiso()      :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Procedimientos Globales implementados en COMMON por comodidad.           *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE CC_CursadaValida( num :TM.NumeroType;
+                            cur :DateTime.DateType ) :BOOLEAN;
+PROCEDURE CC_FinalValido  ( fin :TM.FinalType ) :BOOLEAN;
+
+PROCEDURE CC_CurAprob( cursada :TM.CursadaType ) :BOOLEAN;
+(*
+   Sin control de:
+       * Finales Mal.
+       * Vencimiento por a¤os.
+*)
+
+PROCEDURE CC_CursadaAprobada( mate :TM.MateriaType ) :BOOLEAN;
+
+PROCEDURE CC_FinalAprobado( Finales :TM.FinalesType ) :BOOLEAN;
+
+PROCEDURE CC_FinalAprobadoI( Finales :TM.FinalesType; VAR f :TM.FinalType ) :BOOLEAN;
+
+PROCEDURE InfoMateria(     Mate        :TM.MateriaType; (* Materia a Ctrl      *)
+                       VAR CurAprob    :BOOLEAN;        (* Si Cursada Aprobada *)
+                       VAR FinAprob    :BOOLEAN;        (* Si Final Aprobado   *)
+                       VAR CountFAprob :CARDINAL;       (* Count Finales Aprob *)
+                       VAR CountFDesap :CARDINAL;       (* Count Finales Desap *)
+                       VAR FinalOk     :TM.FinalType ); (* Final Aprobado      *)
+
+END Common.

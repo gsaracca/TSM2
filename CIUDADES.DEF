@@ -1,0 +1,35 @@
+DEFINITION MODULE Ciudades;
+
+FROM GTab  IMPORT Tab;
+FROM FView IMPORT FileViewGet, EditMode;
+
+PROCEDURE InitPointerCiudad();
+PROCEDURE DonePointerCiudad();
+
+TYPE ptrCiudad = POINTER TO CiudadClass;
+CLASS CiudadClass( Tab );
+    PROCEDURE Init( x, y :CARDINAL; gMsg :ARRAY OF CHAR; gVal :CARDINAL );
+END CiudadClass;
+
+(*# save, call( result_optional => on ) *)
+PROCEDURE OpenFile() :BOOLEAN;
+(*# restore *)
+PROCEDURE CloseFile();
+
+PROCEDURE GetCiudad( Ciudad :CARDINAL; VAR name :ARRAY OF CHAR );
+
+(* ------------------------------------------------------------------------ *)
+(* Internal Class                                                           *)
+(* ------------------------------------------------------------------------ *)
+
+CLASS CiudadFile( FileViewGet );
+    VIRTUAL PROCEDURE GetKeyStr( i :CARDINAL; VAR s :ARRAY OF CHAR );
+    VIRTUAL PROCEDURE WrItem( i :LONGCARD; VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :LONGCARD; VAR d :ARRAY OF BYTE; VAR km :BOOLEAN; mode :EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Comp( d1, d2 :CARDINAL ) :BOOLEAN;
+    VIRTUAL PROCEDURE CompData( VAR d1 :ARRAY OF BYTE;
+                                    d2 :CARDINAL ) :INTEGER;
+END CiudadFile;
+
+END Ciudades.

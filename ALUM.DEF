@@ -1,0 +1,19 @@
+DEFINITION MODULE Alum;
+
+IMPORT ClassAlumnos;
+IMPORT FView;
+
+CLASS AlumClass( ClassAlumnos.SearchAlum );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :LONGCARD; VAR d :ARRAY OF BYTE; VAR km :BOOLEAN; mode :FView.EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Listados();
+END AlumClass;
+
+CLASS AlumVClass( ClassAlumnos.SearchAlum );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :LONGCARD; VAR d :ARRAY OF BYTE; VAR km :BOOLEAN; mode :FView.EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Listados();
+END AlumVClass;
+
+
+END Alum.

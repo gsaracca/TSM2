@@ -1,0 +1,976 @@
+DEFINITION MODULE TM;       (* Viejo TypesModule : 17-03-94 *)
+
+IMPORT DateTime;
+IMPORT Nota;
+
+CONST alum_file_name  = 'alumnos';      (* AlumType     : "BTrieve" *)
+      ciud_file_name  = 'ciudades';     (* CiudadesType : "Btrieve" *)
+      tsec_file_name  = 'titsec';       (* TitSecType   : "Btrieve" *)
+      mate_file_name  = 'materias';     (* AlumMateType : "BTrieve" *)
+
+      egre_file_name  = 'egresado';     (* EgreType     : "BTrieve" *)
+      corr_file_name  = 'carr';         (* CarreraType  : "DB-DOS"  *)
+      gene_file_name  = 'generic';      (* GenericType  : "BTrieve" *)
+      book_file_name  = 'libros';       (* BooksType    : "DB-NET"  *)
+      facu_file_name  = 'facultad';     (* FacultadType : "DB-DOS"  *)
+      doce_file_name  = 'docentes';     (* DocentesType : "DB-NET"  *)
+      rema_file_name  = 'rematric';     (* RematricType : "DB_NET"  *)
+      reso_file_name  = 'resoluci';
+
+      alum1_file_name = 'alum1';
+      alum2_file_name = 'alum2';
+
+      xalu_file_name  = 'alumq';        (* Datos al PROCQ      : "Clarion"  *)
+      xegr_file_name  = 'egreq';        (* Datos al PROCQ      : "Clarion"  *)
+      expo_file_name  = 'proc2unc';     (* Datos a Estadistica : "DOS"      *)
+      bibl_file_name  = 'alumnos';      (* Texto formateado    : "FM"       *)
+
+(* ------------------------------------------------------------------------ *)
+(* Datos generales para todos los Tipos.                                    *)
+(* ------------------------------------------------------------------------ *)
+
+CONST true  = 1;
+      false = 0;
+
+TYPE MateriaStr    = ARRAY [ 0..39 ] OF CHAR;
+     NumeroType210 = [ 0..127 ];
+     NumeroType211 = [ 0..127 ];
+     NumeroType219 = [ 0..127 ];
+     NumeroType220 = [ 0..255 ]; (* de 127 a 255 (max.: 269) en 2199.9 *)
+(*     YearType      = [ 0.. 99 ]; *)
+     YearType      = [ 0 .. DateTime.MaxYear ];
+     TituloRange   = [ 0..  7 ];
+     TituloType    = SET OF TituloRange;
+
+PROCEDURE GetMaxTitulo() :TituloRange;
+
+(* ------------------------------------------------------------------------ *)
+(* Datos de archivo de ciudades.                                            *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE CiudadType   = ARRAY [ 0..24 ] OF CHAR;
+     PartidoStr   = ARRAY [ 0..24 ] OF CHAR;
+     ProvinciaStr = ARRAY [ 0..24 ] OF CHAR;
+     PaisStr      = ARRAY [ 0..24 ] OF CHAR;
+     PrefijoStr   = ARRAY [ 0.. 7 ] OF CHAR;
+     ZonaStr      = ARRAY [ 0.. 9 ] OF CHAR;
+
+TYPE CiudadesType219 = RECORD
+          val :CiudadType;
+          cod :CARDINAL;
+     END; (* CiudadesType *)
+
+PROCEDURE InitCiudad219( VAR city :CiudadesType219 );
+
+TYPE CiudadesType220 = RECORD
+         codigo        :LONGCARD;
+         nombre        :CiudadType;
+         partido       :PartidoStr;
+         provincia     :ProvinciaStr;
+         is_argentina  :BOOLEAN;
+         pais          :PaisStr;
+         prefijo_te    :PrefijoStr;
+         zona          :ZonaStr;
+         codigo_postal :CARDINAL;
+     END; (* CiudadesType *)
+
+PROCEDURE InitCiudad220( VAR city :CiudadesType220 );
+
+(* ------------------------------------------------------------------------ *)
+(* Datos actuales utilizados por el programa en ciudades.                   *)
+(* ------------------------------------------------------------------------ *)
+
+CONST CiudadesType ::= CiudadesType220;
+      InitCiudad   ::= InitCiudad220;
+
+(* ------------------------------------------------------------------------ *)
+(* Datos de archivo de T¡tulos Secundarios.                                 *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE TituloSecStr = ARRAY [ 0..24 ] OF CHAR;
+     TituloSecType = RECORD
+          val :TituloSecStr;
+     END; (* TituloSecRec *)
+
+PROCEDURE InitTituloSec( VAR tit :TituloSecType );
+
+(* ------------------------------------------------------------------------ *)
+(* Generales Procedimientos generales de t¡tulos.                           *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE TitToStr( tit :TituloRange; VAR str :ARRAY OF CHAR );
+PROCEDURE WrTit( tit :TituloRange; v :INTEGER );
+PROCEDURE PrTit( tit :TituloRange; v :INTEGER );
+
+PROCEDURE IsTitle( source :TituloType; title :TituloRange ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Datos para las materias gen‚ricas y los libros.                          *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE rango_profesores = [ 0..7 ];
+     ProfesoresType   = ARRAY rango_profesores OF CARDINAL;
+     RangoLibros      = [ 0..31 ];
+     LibroStr         = ARRAY [ 0..12 ] OF CHAR;
+     LibroType = RECORD
+          used   :BOOLEAN;
+          nombre :LibroStr;
+     END; (* LibroType *)
+     LibrosType       = ARRAY RangoLibros OF LibroType;
+     rango_fechas     = [ 0..17 ];
+     FechaType = RECORD
+         dia  :DateTime.DateType;
+         hora :DateTime.TimeType;
+     END; (* FechaType *)
+     FechasType = ARRAY rango_fechas OF FechaType;
+     GenMateType1 = RECORD
+          nombre     :MateriaStr;     (* nombre gen‚rico de la materia     *)
+          area       :CARDINAL;       (* area a la cual pertenece          *)
+          profesores :ProfesoresType; (* profesores de la materia (indice) *)
+          libros     :LibrosType;     (* libros en los cuales se asienta   *)
+     END; (* GenericMateType *)
+     dummy_type = ARRAY [ 0..31 ] OF CARDINAL;
+     GenMateType = RECORD
+          nombre     :MateriaStr;     (* nombre gen‚rico de la materia     *)
+          make_acta  :BOOLEAN;        (* si se genera el acta de la misma  *)
+          activa     :BOOLEAN;        (* si es una materia activa          *)
+          ano        :CARDINAL;       (* a¤o de la materia.                *)
+          profesores :ProfesoresType; (* profesores de la materia (indice) *)
+          libros     :LibrosType;     (* libros en los cuales se asienta   *)
+          fechas     :FechasType;     (* fechas de la materia.             *)
+          dummy      :dummy_type;     (* dummy type for extensions         *)
+     END; (* GenericMateType *)
+
+CONST NullLibro = LibroType( FALSE, '' );
+
+PROCEDURE InitLibro( VAR libro :LibroType );
+PROCEDURE InitLibros( VAR libros :LibrosType );
+PROCEDURE InitProfesores( VAR prof :ProfesoresType );
+PROCEDURE InitGenMate( VAR generic :GenMateType );
+
+TYPE BookType = RECORD
+        used   :BOOLEAN;
+        nombre :LibroStr;
+        folio  :CARDINAL;
+        dummy  :LONGCARD;
+     END; (* BookType *)
+     BooksType = ARRAY [ 0..2047 ] OF BookType;
+
+PROCEDURE InitBook( VAR book :BookType );
+PROCEDURE InitBooks( VAR books :BooksType );
+
+(* ------------------------------------------------------------------------ *)
+(* Datos para el control de correlativas.                                   *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE ConjMaterias211 = SET OF NumeroType211;
+     ConjMaterias219 = SET OF NumeroType219;
+     ConjMaterias220 = SET OF NumeroType220;
+     RangoCursos     = [ 0..7 ];
+     TipoMateType    = ( Anual, Cuat_1, Cuat_2 );
+
+TYPE MateCorrType211 = RECORD (* Versi¢n 2110.0 en adelante *)
+        used         :BOOLEAN;      (* si la materia es usada en el plan    *)
+        nombre       :MateriaStr;   (* nombre de la materia                 *)
+        titulo       :TituloType;   (* titulo de la materia                 *)
+        plan         :YearType;     (* plan de estudios de la materia       *)
+        numero       :NumeroType211;(* numero interno para correlativas     *)
+        is_1er_cuat  :BOOLEAN;      (* Fecha de inicio del cuatrimestre     *)
+        is_count     :BOOLEAN;      (* si la cuento para el t¡tulo          *)
+        is_dummy     :BOOLEAN;      (* si va al t¡tulos.                    *)
+        is_equivalent:BOOLEAN;      (* si es equivalente a otra             *)
+        equivale_a   :NumeroType211;(* si la materia es la misma que otra   *)
+        ano_validez  :YearType;     (* a partir de que a¤o la materia es v. *)
+        mate         :CARDINAL;     (* index : archivo de materias globales *)
+        orden        :NumeroType211;(* numero de orden para el t¡tulo       *)
+        curso        :RangoCursos;  (* a¤o al que pertenece la materia      *)
+        para_cursar_tener_cursado  :ConjMaterias211; (* corr. de la cursada    *)
+        para_cursar_tener_aprobado :ConjMaterias211; (* corr. de la cursada    *)
+        para_rendir_tener_cursado  :ConjMaterias211; (* corr. del final        *)
+        para_rendir_tener_aprobado :ConjMaterias211; (* corr. del final        *)
+        equivalencia :ConjMaterias211; (* corr. de equivalencias *)
+        profesor     :LONGCARD;     (* index de profesores    *)
+     END; (* MateCorrType211 *)
+     MatesCorrType211 = ARRAY NumeroType211 OF MateCorrType211;
+
+     MateCorrType219 = RECORD (* Versi¢n 2198.7 en adelante *)
+        used         :BOOLEAN;      (* si la materia es usada en el plan    *)
+        nombre       :MateriaStr;   (* nombre de la materia                 *)
+        titulo       :TituloType;   (* titulo de la materia                 *)
+        plan         :YearType;     (* plan de estudios de la materia       *)
+        numero       :NumeroType219;(* numero interno para correlativas     *)
+        is_1er_cuat  :BOOLEAN;      (* Fecha de inicio del cuatrimestre     *)
+        is_count     :BOOLEAN;      (* si la cuento para el t¡tulo          *)
+        is_dummy     :BOOLEAN;      (* si va al t¡tulos.                    *)
+        is_equivalent:BOOLEAN;      (* si es equivalente a otra             *)
+        equivale_a   :NumeroType219;(* si la materia es la misma que otra   *)
+        ano_validez  :YearType;     (* a partir de que a¤o la materia es v. *)
+        mate         :CARDINAL;     (* index : archivo de materias globales *)
+        orden        :NumeroType219;(* numero de orden para el t¡tulo       *)
+        curso        :RangoCursos;  (* a¤o al que pertenece la materia      *)
+        para_cursar_tener_cursado  :ConjMaterias219; (* corr. de la cursada    *)
+        para_cursar_tener_aprobado :ConjMaterias219; (* corr. de la cursada    *)
+        para_rendir_tener_cursado  :ConjMaterias219; (* corr. del final        *)
+        para_rendir_tener_aprobado :ConjMaterias219; (* corr. del final        *)
+        equivalencia :ConjMaterias219; (* corr. de equivalencias               *)
+        tipo_materia :TipoMateType; (* Anual, Primer-Segundo Cuatrimestre   *)
+        profesor     :CARDINAL;     (* index del archivo de profesores      *)
+        dummy        :SHORTCARD;    (* dummy type                           *)
+     END; (* MateCorrType219 *)
+     MatesCorrType219  = ARRAY NumeroType219 OF MateCorrType219;
+
+     MateCorrType220 = RECORD (* Versi¢n 2199.9 en adelante *)
+        used           :BOOLEAN;       (* si la materia es usada en el plan    *)
+        nombre         :MateriaStr;    (* nombre de la materia                 *)
+        titulo         :TituloType;    (* titulo de la materia                 *)
+        plan           :YearType;      (* plan de estudios de la materia       *)
+        numero         :NumeroType220; (* numero interno para correlativas     *)
+        is_1er_cuat    :BOOLEAN;       (* Fecha de inicio del cuatrimestre     *)
+        is_count       :BOOLEAN;       (* si la cuento para el t¡tulo          *)
+        is_dummy       :BOOLEAN;       (* si va al t¡tulos.                    *)
+        is_equivalent  :BOOLEAN;       (* si es equivalente a otra             *)
+        admite_opt     :BOOLEAN;       (* si admite optativas como materias    *)
+        is_optativa    :BOOLEAN;       (* si es una materia optativa           *)
+        equivale_a     :NumeroType220; (* si la materia es la misma que otra   *)
+        ano_validez    :YearType;      (* a partir de que a¤o la materia es v. *)
+        mate           :CARDINAL;      (* index : archivo de materias globales *)
+        orden          :NumeroType220; (* numero de orden para el t¡tulo       *)
+        curso          :RangoCursos;   (* a¤o al que pertenece la materia      *)
+        tipo_materia   :TipoMateType;  (* Anual, Primer-Segundo Cuatrimestre   *)
+        profesor       :CARDINAL;      (* index del archivo de profesores      *)
+        is_promocional :BOOLEAN;       (* if promocional                       *)
+        is_tesis       :BOOLEAN;       (* if tesis / tesina / seminario        *)
+        para_cursar_tener_cursado  :ConjMaterias220;  (* corr. de la cursada *)
+        para_cursar_tener_aprobado :ConjMaterias220;  (* corr. de la cursada *)
+        para_rendir_tener_cursado  :ConjMaterias220;  (* corr. del final     *)
+        para_rendir_tener_aprobado :ConjMaterias220;  (* corr. del final     *)
+        equivalencia               :ConjMaterias220;  (* corr. equivalentes  *)
+     END; (* MateCorrType220 *)
+     MatesCorrType220  = ARRAY NumeroType220 OF MateCorrType220;
+
+TYPE dummyType230 = ARRAY [ 0..7 ] OF CARDINAL;
+
+     MateCorrType230 = RECORD (* Versi¢n 2300.0 en adelante *)
+        used           :BOOLEAN;       (* si la materia es usada en el plan    *)
+        nombre         :MateriaStr;    (* nombre de la materia                 *)
+        titulo         :TituloType;    (* titulo de la materia                 *)
+        plan           :YearType;      (* plan de estudios de la materia       *)
+        numero         :NumeroType220; (* numero interno para correlativas     *)
+        is_1er_cuat    :BOOLEAN;       (* Fecha de inicio del cuatrimestre     *)
+        is_count       :BOOLEAN;       (* si la cuento para el t¡tulo          *)
+        is_dummy       :BOOLEAN;       (* si va al t¡tulos.                    *)
+        is_equivalent  :BOOLEAN;       (* si es equivalente a otra             *)
+        admite_opt     :BOOLEAN;       (* si admite optativas como materias    *)
+        is_optativa    :BOOLEAN;       (* si es una materia optativa           *)
+        equivale_a     :NumeroType220; (* si la materia es la misma que otra   *)
+        ano_validez    :YearType;      (* a partir de que a¤o la materia es v. *)
+        mate           :CARDINAL;      (* index : archivo de materias globales *)
+        orden          :NumeroType220; (* numero de orden para el t¡tulo       *)
+        curso          :RangoCursos;   (* a¤o al que pertenece la materia      *)
+        tipo_materia   :TipoMateType;  (* Anual, Primer-Segundo Cuatrimestre   *)
+        profesor       :CARDINAL;      (* index del archivo de profesores      *)
+        is_promocional :BOOLEAN;       (* if promocional                       *)
+        is_tesis       :BOOLEAN;       (* if tesis / tesina / seminario        *)
+        para_cursar_tener_cursado  :ConjMaterias220;  (* corr. de la cursada *)
+        para_cursar_tener_aprobado :ConjMaterias220;  (* corr. de la cursada *)
+        para_rendir_tener_cursado  :ConjMaterias220;  (* corr. del final     *)
+        para_rendir_tener_aprobado :ConjMaterias220;  (* corr. del final     *)
+        equivalencia               :ConjMaterias220;  (* corr. equivalentes  *)
+        dummy                      :dummyType230;
+     END; (* MateCorrType230 *)
+     MatesCorrType230 = ARRAY NumeroType220 OF MateCorrType230;
+
+PROCEDURE InitMateCorrType219 ( VAR mate  :MateCorrType219  );
+PROCEDURE InitMatesCorrType219( VAR mates :MatesCorrType219 );
+
+PROCEDURE InitMateCorrType220 ( VAR mate  :MateCorrType220  );
+PROCEDURE InitMatesCorrType220( VAR mates :MatesCorrType220 );
+
+PROCEDURE InitMateCorrType230 ( VAR mate  :MateCorrType230  );
+PROCEDURE InitMatesCorrType230( VAR mates :MatesCorrType230 );
+
+(* ------------------------------------------------------------------------ *)
+(* Datos generales para las Facultades y los planes de estudio.             *)
+(* ------------------------------------------------------------------------ *)
+TYPE PlanType = YearType;
+     RangoPlanes = [ 0..5 ];
+     PlanesType  = ARRAY RangoPlanes OF PlanType;
+
+     CarreraStored211 = RECORD
+         planes     :PlanesType;
+         max_planes :RangoPlanes;
+         max_mates  :NumeroType211;
+         materias   :MatesCorrType211;
+     END; (* CarreraStored211 *)
+
+     CarreraStored219 = RECORD
+         planes     :PlanesType;
+         max_planes :RangoPlanes;
+         max_mates  :NumeroType219;
+         materias   :MatesCorrType219;  (* Modificar para hacer actualizaci¢n *)
+     END; (* CarreraStored219 *)
+
+     CarreraStored220 = RECORD
+         planes     :PlanesType;
+         max_planes :RangoPlanes;
+         max_mates  :NumeroType220;
+         materias   :MatesCorrType220;  (* Modificar para hacer actualizaci¢n *)
+     END; (* CarreraStored220 *)
+
+     CarreraStored230 = RECORD
+         planes     :PlanesType;
+         max_planes :RangoPlanes;
+         max_mates  :NumeroType220;
+         materias   :MatesCorrType230;  (* Modificar para hacer actualizaci¢n *)
+     END; (* CarreraStored230 *)
+
+PROCEDURE InitPlan( VAR plan :PlanType );
+PROCEDURE InitPlanesType( VAR planes :PlanesType );
+
+PROCEDURE InitCarreraStored211( VAR carr :CarreraStored211 );
+PROCEDURE InitCarreraStored219( VAR carr :CarreraStored219 );
+PROCEDURE InitCarreraStored220( VAR carr :CarreraStored220 );
+PROCEDURE InitCarreraStored230( VAR carr :CarreraStored230 );
+
+(* ------------------------------------------------------------------------ *)
+(* Constants, Types & Procedures of "NumeroType".                           *)
+(* ------------------------------------------------------------------------ *)
+
+CONST NumeroType        ::= NumeroType220;
+      ConjMaterias      ::= ConjMaterias220;
+      MateCorrType      ::= MateCorrType220;
+      MatesCorrType     ::= MatesCorrType220;
+      CarreraStored     ::= CarreraStored220;
+
+      InitMateCorrType  ::= InitMateCorrType220;
+      InitCarreraStored ::= InitCarreraStored220;
+
+(* ------------------------------------------------------------------------ *)
+(* Datos generales de la Facultad.                                          *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE FacultadStr   = ARRAY [ 0..39 ] OF CHAR;
+     TituloStr     = ARRAY [ 0..57 ] OF CHAR;
+     CarreraStr    = ARRAY [ 0..31 ] OF CHAR;
+     DomicilioType = ARRAY [ 0..24 ] OF CHAR;
+     TelefonoStr   = ARRAY [ 0..10 ] OF CHAR;
+
+TYPE RangoCarreras219 = [ 0.. 7 ];
+     CarrType219 = RECORD
+         nombre   :CarreraStr;
+         titulo   :ARRAY TituloRange OF TituloStr;
+         egresado :ARRAY TituloRange OF TituloStr;
+     END;
+     CarrerasType219 = ARRAY RangoCarreras219 OF CarrType219;
+     FacultadType219 = RECORD
+          nombre       :FacultadStr;
+          carreras     :CarrerasType219;
+          max_carreras :RangoCarreras219;
+     END; (* FacultadType219 *)
+
+PROCEDURE InitCarrType219( VAR carr :CarrType219 );
+PROCEDURE InitCarrerasType219( VAR carrs :CarrerasType219 );
+PROCEDURE InitFacultad219( VAR facu :FacultadType219 );
+
+TYPE RangoCarreras220 = [ 0..15 ];
+     TituloCarrType = RECORD
+         nombre   :TituloStr;
+         codigo   :CARDINAL;
+         egresado :TituloStr;
+     END; (* TituloType *)
+     TitulosType = ARRAY TituloRange OF TituloCarrType;
+     CarrType220 = RECORD
+         nombre  :CarreraStr;
+         codigo  :CARDINAL;
+         titulos :TitulosType;
+     END; (* CarrType220 *)
+     CarrerasType220 = ARRAY RangoCarreras220 OF CarrType220;
+     FacultadType220 = RECORD
+          nombre       :FacultadStr;
+          direccion    :DomicilioType;
+          TE           :TelefonoStr;
+          FAX          :TelefonoStr;
+          Ciudad       :CiudadType;
+          CP           :CARDINAL;
+          carreras     :CarrerasType220;
+          max_carreras :RangoCarreras220;
+     END; (* FacultadType220 *)
+
+PROCEDURE InitCarrType220( VAR carr :CarrType220 );
+PROCEDURE InitCarrerasType220( VAR carrs :CarrerasType220 );
+PROCEDURE InitFacultad220( VAR facu :FacultadType220 );
+
+(* ------------------------------------------------------------------------ *)
+(* Tipo usados actualmente, Carrera, Carreras, Facultad, RangoCarreras      *)
+(* ------------------------------------------------------------------------ *)
+
+CONST RangoCarreras    ::= RangoCarreras220;
+      CarrType         ::= CarrType220;
+      CarrerasType     ::= CarrerasType220;
+      FacultadType     ::= FacultadType220;
+      InitCarrType     ::= InitCarrType220;
+      InitCarrerasType ::= InitCarrerasType220;
+      InitFacultad     ::= InitFacultad220;
+
+CONST CarreraType ::= RangoCarreras;
+
+(* ------------------------------------------------------------------------ *)
+(* Datos para el alumno.                                                    *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE KeyType = RECORD
+         numero :NumeroType;
+         fecha  :DateTime.DateType;
+     END; (* KeyType *)
+
+PROCEDURE GetIniCuat( anual :BOOLEAN; ano :CARDINAL ) :DateTime.DateType;
+PROCEDURE GetEndCuat( anual :BOOLEAN; ano :CARDINAL ) :DateTime.DateType;
+
+TYPE NumResType = [ 0..999 ];
+     ResType = RECORD
+         numero :NumResType;  (* n£mero de la resoluci¢n. *)
+         ano    :YearType;    (* a¤o de la resoluci¢n.    *)
+     END; (* ResType *)
+
+TYPE RangoParciales = [ 0..3 ];
+     ParcialesType = ARRAY RangoParciales OF Nota.NotaType;
+     RangoOtras    = [ 0..2 ];
+     OtrasType     = ARRAY RangoOtras OF Nota.NotaType;
+     CursadaType = RECORD
+        condicional :BOOLEAN;
+        parciales   :ParcialesType;
+        otras       :OtrasType;  (* Veterinaria: RC, TP & Asis    *)
+                                 (* Humanas:     Otras (Concepto) *)
+                                 (* Ingenieria:  --               *)
+                                 (* Sociales:    --               *)
+                                 (* Exactas:     Otras Prefinal   *)
+        resolucion :ResType;
+     END; (* CursadaType *)
+
+TYPE LlamadoType    = [ 0..15 ];
+     FolioType      = [ 0..1023 ];
+     TipoExamenType = ( regular, libre, promocional, condicional,
+                        equivalencia, revalida );
+     RangoFinales = [ 0..5 ];
+     ObservacionesType = ARRAY [ 0..19 ] OF CHAR;
+     RangoMaterias = [ 0..62 ];
+
+TYPE FinalType219 = RECORD
+         nota        :Nota.NotaType;
+         fecha       :DateTime.DateType;
+         llamado     :LlamadoType;
+         folio       :FolioType;
+         libro       :RangoLibros;
+         resolucion  :ResType;
+     END;
+     FinalesType219 = ARRAY RangoFinales OF FinalType219;
+
+PROCEDURE InitFinal219( VAR f :FinalType219 );
+
+TYPE FinalType220 = RECORD
+         nota        :Nota.NotaType;
+         fecha       :DateTime.DateType;
+         llamado     :LlamadoType;
+         folio       :FolioType;
+         libro       :RangoLibros;
+         resolucion  :ResType;
+         tipo_examen :TipoExamenType;
+     END;
+     FinalesType220 = ARRAY RangoFinales OF FinalType220;
+
+PROCEDURE InitFinal220( VAR f :FinalType220 );
+
+TYPE MateriaType219 = RECORD
+         used          :BOOLEAN;
+         key           :KeyType;
+         cursada       :CursadaType;
+         finales       :FinalesType219;
+         observaciones :ObservacionesType;
+     END;
+     MateriasType219 = ARRAY RangoMaterias OF MateriaType219;
+
+PROCEDURE InitMateria219 ( VAR m :MateriaType219 );
+PROCEDURE InitMaterias219( VAR m :MateriasType219 );
+
+TYPE MateriaType220 = RECORD
+         used          :BOOLEAN;
+         key           :KeyType;
+         optativa      :CARDINAL;
+         cursada       :CursadaType;
+         finales       :FinalesType220;
+         observaciones :ObservacionesType;
+     END;
+     MateriasType220 = ARRAY RangoMaterias OF MateriaType220;
+
+PROCEDURE InitMateria220 ( VAR m :MateriaType220 );
+PROCEDURE InitMaterias220( VAR m :MateriasType220 );
+
+(* ------------------------------------------------------------------------ *)
+(* Datos del alumno.                                                        *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE NameType       = ARRAY [ 0..29 ] OF CHAR;  (* Nombre del Alumno      *)
+     LUType         = LONGCARD;                 (* Libreta Universitaria  *)
+     DocType        = ( DNI, LC, LE, PAS, CF );
+     DNIType        = LONGCARD;                 (* Documento de Identidad *)
+     ColegioType    = ARRAY [ 0..24 ] OF CHAR;
+     RematRange     = [ 0..28 ];
+     RematYearsType = ARRAY RematRange OF YearType;
+
+TYPE AlumFileType219 = RECORD
+         Name        :NameType;
+         LU          :LUType;
+         DNI         :DNIType;
+         DomLocal    :DomicilioType;
+         TE          :TelefonoStr;
+         DomOrigen   :DomicilioType;
+         CiudadOrig  :CARDINAL;
+         Nacimiento  :DateTime.DateType;
+         CiudadNac   :CARDINAL;
+         ColegioSec  :ColegioType;
+         TituloSec   :CARDINAL;
+         CiudadCol   :CARDINAL;
+         AnoEgreso   :YearType;
+         AnoIng      :YearType;
+         Carrera     :RangoCarreras;
+         PlanEst     :YearType;
+         PlanCorr    :YearType;
+         Egresado    :BOOLEAN;
+         Rematric    :RematYearsType;
+         AnoCursada  :YearType;
+         Titulo      :TituloRange;
+     END; (* AlumFileType219 *)
+
+PROCEDURE InitAlumFile219( VAR al :AlumFileType219 );
+
+TYPE AlumType219 = RECORD
+         datpers  :AlumFileType219;
+         Materias :MateriasType219;
+     END; (* AlumType219 *)
+
+PROCEDURE InitAlum219( VAR al :AlumType219 );
+
+TYPE SexoType = CARDINAL;
+
+CONST _varon = 0;
+      _mujer = 1;
+
+PROCEDURE SexoToStr( sexo :SexoType; VAR str :ARRAY OF CHAR );
+
+TYPE AlumFileType220 = RECORD
+         Name        :NameType;
+         LU          :LUType;
+         TipoDoc     :DocType;
+         DNI         :DNIType;
+         DomLocal    :DomicilioType;
+         TE_Local    :TelefonoStr;
+         DomOrigen   :DomicilioType;
+         TE_Origen   :TelefonoStr;
+         CiudadOrig  :CARDINAL;
+         Nacimiento  :DateTime.DateType;
+         CiudadNac   :CARDINAL;
+         ColegioSec  :ColegioType;
+         TituloSec   :CARDINAL;
+         CiudadCol   :CARDINAL;
+         AnoEgreso   :YearType;
+         AnoIng      :YearType;
+         Carrera     :RangoCarreras;
+         Titulo      :TituloRange;
+         PlanInicio  :YearType;
+         PlanEst     :YearType;
+         PlanCorr    :YearType;
+         is_regular  :BOOLEAN;
+         is_egresado :BOOLEAN;
+         is_rematric :BOOLEAN;
+         AnoRematric :YearType;
+         Rematric    :RematYearsType;
+         sexo        :SexoType;
+     END; (* AlumFileType220 *)
+
+PROCEDURE InitAlumFile220( VAR al :AlumFileType220 );
+
+TYPE AlumType220 = RECORD
+         datpers  :AlumFileType220;
+         Materias :MateriasType220;
+     END; (* AlumType *)
+
+PROCEDURE InitAlum220( VAR al :AlumType220 );
+
+(* ------------------------------------------------------------------------ *)
+(* Alias de los procedimientos utilizados por el programa.                  *)
+(* ------------------------------------------------------------------------ *)
+
+CONST FinalType    ::= FinalType220;
+      FinalesType  ::= FinalesType220;
+      MateriaType  ::= MateriaType220;
+      MateriasType ::= MateriasType220;
+      AlumFileType ::= AlumFileType220;
+      AlumType     ::= AlumType220;
+      InitFinal    ::= InitFinal220;
+      InitMateria  ::= InitMateria220;
+      InitMaterias ::= InitMaterias220;
+      InitAlumFile ::= InitAlumFile220;
+      InitAlum     ::= InitAlum220;
+
+PROCEDURE InitKey( VAR k :KeyType );
+PROCEDURE InitCursada( VAR c :CursadaType );
+PROCEDURE InitRematYearType( VAR r :RematYearsType );
+
+(* ------------------------------------------------------------------------ *)
+(* Para futura implementaci¢n en normalizaci¢n del curr¡culum.              *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE MateFileType = RECORD
+         LU      :LUType;
+         Carrera :RangoCarreras;
+         Materia :MateriaType;
+     END; (* MateFileType *)
+
+PROCEDURE InitMateFileType( VAR ma :MateFileType );
+
+PROCEDURE AF2Alum( VAR al :AlumType;     VAR af :AlumFileType );
+PROCEDURE Alum2AF( VAR af :AlumFileType; VAR al :AlumType     );
+
+(* ------------------------------------------------------------------------ *)
+(* Datos de materias manejadas por MM.                                      *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE CurMateType = RECORD
+        pointer :CARDINAL;     (* alumno *)
+        nombre  :NameType;     (* 2100.2 *)
+        dni     :DNIType;      (* 2100.2 *)
+        lu      :LUType;       (* 2100.2 *)
+        cursada :CursadaType;
+     END; (* CurMateType *)
+
+PROCEDURE InitCurMateType( VAR mate :CurMateType );
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos y Funciones sobre Resoluciones.                           *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE InitRes() :ResType;
+PROCEDURE IsNullRes( res :ResType ) :BOOLEAN;
+PROCEDURE ResToStr( res :ResType; VAR str :ARRAY OF CHAR );
+
+(* ------------------------------------------------------------------------ *)
+(* Datos sobre actas de finales del PROCEX.                                 *)
+(* ------------------------------------------------------------------------ *)
+
+CONST MaxPage        =  26 - 1;  (* 26 TypesModulenos por p gina. *)
+      MaxTypesModule = 208 - 1;  (* 26 alumnos por acta == 8 actas ==> 8 * 26 = 234. *)
+      MaxActa        = MaxTypesModule DIV MaxPage; (* 9 p ginas por acta. *)
+
+TYPE PagesRange = [ 0..MaxPage ];
+     ActasRange = [ 0..MaxActa ];
+
+TYPE LineType = RECORD
+         used     :BOOLEAN;
+         nombre   :NameType;
+         index    :CARDINAL;            (* puntero al alumno en el archivo *)
+         permiso  :CARDINAL;
+         num_mate :NumeroType;
+         res      :ResType;
+         lu       :LUType;
+         dni      :DNIType;
+         escrito  :Nota.NotaType;
+         oral     :Nota.NotaType;
+         calif    :Nota.NotaType;
+     END; (* LineType *)
+     TribunalType    = ProfesoresType;
+     CursoType       = ARRAY [ 0.. 8 ] OF CHAR;
+     LlamadoStr      = ARRAY [ 0..24 ] OF CHAR;
+     ObservacionType = ARRAY [ 0..39 ] OF CHAR;
+     AlumnosRange    = [ 0..MaxTypesModule ];
+     AlumnosType     = ARRAY AlumnosRange OF LineType;
+     ActaType1 = RECORD
+         transfer     :BOOLEAN;
+         name_mate    :MateriaStr;
+         curso        :CursoType;
+         fecha        :DateTime.DateType;
+         hora         :DateTime.TimeType;
+         orden        :CARDINAL;
+         libro_index  :CARDINAL; (* indice del libro en el archivo de libros *)
+         libro_orden  :CARDINAL; (* orden del libro usado.                   *)
+         folio        :CARDINAL;
+         llamado      :LlamadoStr;
+         tipo_examen  :TipoExamenType;
+         observacion1 :ObservacionType;
+         observacion2 :ObservacionType;
+         observacion3 :ObservacionType;
+         alumnos      :AlumnosType;
+     END; (* ActaType1 *)
+     ActaType = RECORD
+         transfer     :BOOLEAN;
+         name_mate    :MateriaStr;
+         curso        :CursoType;
+         fecha        :DateTime.DateType;
+         hora         :DateTime.TimeType;
+         orden        :CARDINAL;
+         libro_index  :CARDINAL; (* indice del libro en el archivo de libros *)
+         libro_orden  :CARDINAL; (* orden del libro usado.                   *)
+         folio        :CARDINAL;
+         llamado      :LlamadoStr;
+         tipo_examen  :TipoExamenType;
+         observacion1 :ObservacionType;
+         observacion2 :ObservacionType;
+         observacion3 :ObservacionType;
+         tribunal     :TribunalType;    (* Agregado en la version: 2198.7 *)
+         alumnos      :AlumnosType;
+     END; (* ActaType *)
+
+PROCEDURE InitLine( VAR line :LineType );
+PROCEDURE InitActa1( VAR acta :ActaType1 );
+PROCEDURE InitActa( VAR acta :ActaType );
+
+PROCEDURE IsLineNull( l :LineType ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Datos para PROCEX.                                                       *)
+(* ------------------------------------------------------------------------ *)
+
+CONST prefix_1 = 'fc_';
+      prefix_2 = 'f2_';
+      prefix   = prefix_2;
+      acta_file_name = prefix + 'nula';
+
+(* ------------------------------------------------------------------------ *)
+(* Datos para PROCTIT.                                                      *)
+(* ------------------------------------------------------------------------ *)
+
+CONST FileExt3 = 'ti3';
+      FileExt4 = 'ti4';
+      FileExt5 = 'ti5';
+      FileExt  = FileExt5;
+
+(* ------------------------------------------------------------------------ *)
+(* Datos para DOCENTES.                                                     *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE CarType = ( Tit, Adj, Asoc, JTP, Ay1ra, Ay2da );
+     DedType = ( Adhonorem, Simple, Semi, Exclusiva );
+     SitType = ( Ordinario, Interino );
+     PosType = ( Si, No, Realizando );
+
+PROCEDURE DocToStr( doc :DocType; VAR str :ARRAY OF CHAR );
+PROCEDURE CarToStr( car :CarType; VAR str :ARRAY OF CHAR );
+PROCEDURE DedToStr( ded :DedType; VAR str :ARRAY OF CHAR );
+PROCEDURE SitToStr( sit :SitType; VAR str :ARRAY OF CHAR );
+PROCEDURE PosToStr( pos :PosType; VAR str :ARRAY OF CHAR );
+
+PROCEDURE WrDoc( doc :DocType; l :INTEGER );
+PROCEDURE WrCar( car :CarType; l :INTEGER );
+PROCEDURE WrDed( ded :DedType; l :INTEGER );
+PROCEDURE WrSit( sit :SitType; l :INTEGER );
+PROCEDURE WrPos( pos :PosType; l :INTEGER );
+
+PROCEDURE PrDoc( doc :DocType; l :INTEGER );
+PROCEDURE PrCar( car :CarType; l :INTEGER );
+PROCEDURE PrDed( ded :DedType; l :INTEGER );
+PROCEDURE PrSit( sit :SitType; l :INTEGER );
+PROCEDURE PrPos( pos :PosType; l :INTEGER );
+
+TYPE MateType = RECORD
+          Used       :BOOLEAN;
+          Nombre     :CARDINAL;  (* indexed *)
+          Porcentaje :CARDINAL;
+     END;
+     RangoMates = [ 0..9 ];
+     MatesType = ARRAY RangoMates OF MateType;
+     CargoType = RECORD
+           Used       :BOOLEAN;
+           Cargo      :CarType;
+           Dedicacion :DedType;
+           Situacion  :SitType;
+           Hs_doc     :CARDINAL;
+           Hs_inv     :CARDINAL;
+           Hs_ext     :CARDINAL;
+           Materias   :MatesType;
+     END; (* CargosType *)
+     RangoCargos = [ 0..6 ];
+     CargosType = ARRAY RangoCargos OF CargoType;
+     DocenType = RECORD
+          Nombre    :NameType;
+          Tipo_doc  :DocType;
+          Num_doc   :DNIType;
+          Domicilio :DomicilioType;
+          Ciudad    :CARDINAL;    (* indexed *)
+          PostGrado :PosType;
+          Otros     :ARRAY [ 0..2 ] OF BOOLEAN;
+          Cargos    :CargosType;
+     END;
+
+PROCEDURE InitMate  ( VAR m :MateType   );
+PROCEDURE InitMates ( VAR m :MatesType  );
+PROCEDURE InitCargo ( VAR c :CargoType  );
+PROCEDURE InitCargos( VAR c :CargosType );
+PROCEDURE InitDocen ( VAR d :DocenType  );
+
+TYPE HistStr = ARRAY [ 0..50 ] OF CHAR;
+     HistoriaType = RECORD
+         Docente    :CARDINAL;       (* pointer "indexed" *)
+         Resolucion :ResType;
+         Cargos     :HistStr;
+         Materias   :HistStr;
+         Comentario :HistStr;
+     END; (* HistoriaType *)
+
+PROCEDURE InitHist() :HistoriaType;
+
+TYPE ResolType = RECORD
+         numero  :CARDINAL;
+         ano     :YearType;
+         tipo    :CARDINAL;     (* tipo de la resoluci¢m: alta, baja, modif *)
+         fecha   :DateTime.DateType;
+         docente :CARDINAL;     (* indexed *)
+         cargos  :CargosType;
+     END; (* DocenResType *)
+
+PROCEDURE InitResolType() :ResolType;
+
+(* ------------------------------------------------------------------------ *)
+(* Datos de la rematriculaci¢n.                                             *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE InscMateType   = KeyType;
+     InscMatesRange = [ 0..15 ];
+     InscMatesType  = ARRAY InscMatesRange OF InscMateType;
+
+TYPE EstDestinoStr     = ARRAY [ 0..24 ] OF CHAR;
+     EstUniversidadStr = ARRAY [ 0..24 ] OF CHAR;
+     EstFacultadStr    = ARRAY [ 0..24 ] OF CHAR;
+     EstCarreraStr     = ARRAY [ 0..24 ] OF CHAR;
+
+TYPE RematType = RECORD
+         index_file       :CARDINAL;     (* pointer to File *)
+         rem_carr_1       :CARDINAL;
+         rem_carr_2       :CARDINAL;
+         rem_carr_3       :CARDINAL;
+         matricula        :LUType;
+         ano              :CARDINAL;
+         ano_insc         :CARDINAL;
+         documento        :DNIType;
+         nombre           :NameType;
+         est_civil        :CARDINAL;
+         dom_familia      :DomicilioType;
+         te_familia       :TelefonoStr;
+         ciudad_familia   :CARDINAL;     (* index *)
+         dom_residencia   :DomicilioType;
+         te_residencia    :TelefonoStr;
+         trabaja          :CARDINAL;
+         cat_horas        :CARDINAL;
+         relacion_trabajo :CARDINAL;
+         serv_militar     :CARDINAL;
+         ano_servicio     :CARDINAL;
+         destino_serv_mil :EstDestinoStr;
+         otros_est_sup    :CARDINAL;
+         universidad      :EstUniversidadStr;
+         otro_facultad    :EstFacultadStr;
+         otro_carrera     :EstCarreraStr;
+         otros_estado     :CARDINAL;
+         otros_ano        :CARDINAL;
+         pidio_equivalenc :CARDINAL;
+         cursadas         :InscMatesType;
+     END; (* RematType *)
+
+TYPE CiudadStr = ARRAY [ 0..31 ] OF CHAR;
+     EstadisticaType = RECORD           (* Archivo de exportaci¢n *)
+         rem_carr_1       :CARDINAL;
+         rem_carr_2       :CARDINAL;
+         rem_carr_3       :CARDINAL;
+         matricula        :LUType;
+         ano              :CARDINAL;
+         ano_insc         :CARDINAL;
+         documento        :DNIType;
+         nombre           :NameType;
+         est_civil        :CARDINAL;
+         dom_familia      :DomicilioType;
+         te_familia       :TelefonoStr;
+         ciudad_familia   :CiudadStr;     (* index : CityFile *)
+         dom_residencia   :DomicilioType;
+         te_residencia    :TelefonoStr;
+         trabaja          :CARDINAL;
+         cat_horas        :CARDINAL;
+         relacion_trabajo :CARDINAL;
+         serv_militar     :CARDINAL;
+         ano_servicio     :CARDINAL;
+         destino_serv_mil :EstDestinoStr;
+         otros_est_sup    :CARDINAL;
+         universidad      :EstUniversidadStr;
+         otro_facultad    :EstFacultadStr;
+         otro_carrera     :EstCarreraStr;
+         otros_estado     :CARDINAL;
+         otros_ano        :CARDINAL;
+         pidio_equivalenc :CARDINAL;
+     END; (* end : type *)
+
+PROCEDURE InitRematType( VAR remat :RematType );
+
+(* ------------------------------------------------------------------------ *)
+(* Datos de alumnos egresados.                                              *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE EgresadoType219 = RECORD
+         index        :CARDINAL;               (* index de alumnos *)
+         nombre       :NameType;
+         Tipo_doc     :DocType;
+         DNI          :DNIType;
+         domicilio    :DomicilioType;
+         te           :TelefonoStr;
+         ciudad       :CARDINAL;               (* index to ciudades    *)
+         nacimiento   :DateTime.DateType;
+         fecha_egreso :DateTime.DateType;
+         fecha_matric :DateTime.DateType;
+         ano_ingreso  :YearType;
+         promedio     :Nota.NotaType;
+         aplazos      :CARDINAL;
+         carrera      :CarreraType;
+         pidio_equiv  :CARDINAL;               (* si/no                *)
+     END; (* EgresadoType *)
+
+PROCEDURE InitEgresadoType219( VAR eg :EgresadoType219 );
+
+TYPE EgresadoType220 = RECORD
+         index        :CARDINAL;               (* index de alumnos *)
+         nombre       :NameType;
+         TipoDoc      :DocType;
+         DNI          :DNIType;
+         domicilio    :DomicilioType;
+         te           :TelefonoStr;
+         ciudad       :CARDINAL;               (* index to ciudades    *)
+         nacimiento   :DateTime.DateType;
+         fecha_egreso :DateTime.DateType;
+         fecha_matric :DateTime.DateType;
+         ano_ingreso  :YearType;
+         promedio     :Nota.NotaType;
+         aplazos      :CARDINAL;
+         carrera      :CarreraType;
+         titulo       :TituloRange;
+         pidio_equiv  :CARDINAL;               (* si/no                *)
+     END; (* EgresadoType *)
+
+PROCEDURE InitEgresadoType220( VAR eg :EgresadoType220 );
+
+(* ------------------------------------------------------------------------ *)
+(* Implementaciones de tipos vigentes para egresados.                       *)
+(* ------------------------------------------------------------------------ *)
+
+CONST EgresadoType     ::= EgresadoType220;
+      InitEgresadoType ::= InitEgresadoType220;
+
+(* ------------------------------------------------------------------------ *)
+(* Otros tipos de datos globales.                                           *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE set_of_card = SET OF CARDINAL;
+CONST null_set = set_of_card{};
+
+TYPE ProcType = PROCEDURE( AlumType, VAR AlumType );
+
+(* ------------------------------------------------------------------------ *)
+(* Particulares de cada Facultad                                            *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE IsAPU( tit :TM.TituloRange ) :BOOLEAN;
+
+END TM.

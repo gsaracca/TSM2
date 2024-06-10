@@ -1,0 +1,166 @@
+DEFINITION MODULE Carreras;
+
+IMPORT TM, DateTime;
+
+PROCEDURE InitCarrera( Carr :TM.CarreraType );
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos y funciones sobre materias.                               *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetUsedMateria  ( i :TM.NumeroType ) :BOOLEAN;
+PROCEDURE GetNombreMateria( i :TM.NumeroType ) :TM.MateriaStr;
+PROCEDURE GetTituloMateria( i :TM.NumeroType ) :TM.TituloType;
+PROCEDURE GetPlanMateria  ( i :TM.NumeroType ) :TM.YearType;
+PROCEDURE GetNumeroMateria( i :TM.NumeroType ) :TM.NumeroType;
+PROCEDURE Is1erCuatMateria( i :TM.NumeroType ) :BOOLEAN;
+PROCEDURE IsCountMateria  ( i :TM.NumeroType ) :BOOLEAN;
+PROCEDURE IsDummyMateria  ( i :TM.NumeroType ) :BOOLEAN;
+PROCEDURE IsEquivalente   ( i :TM.NumeroType ) :BOOLEAN;
+PROCEDURE AdmiteOptativas ( i :TM.NumeroType ) :BOOLEAN;
+PROCEDURE IsOptativa      ( i :TM.NumeroType ) :BOOLEAN;
+PROCEDURE IsPromocional   ( i :TM.NumeroType ) :BOOLEAN;
+PROCEDURE IsTesis         ( i :TM.NumeroType ) :BOOLEAN;
+PROCEDURE GetEquivalente  ( i :TM.NumeroType ) :TM.NumeroType;
+PROCEDURE GetUniqueMateria( i :TM.NumeroType ) :CARDINAL;
+PROCEDURE GetOrdenMateria ( i :TM.NumeroType ) :TM.NumeroType;
+PROCEDURE GetCursoMateria ( i :TM.NumeroType ) :TM.RangoCursos;
+PROCEDURE GetTipoMateria  ( i :TM.NumeroType ) :TM.TipoMateType;
+PROCEDURE GetProfesor     ( i :TM.NumeroType ) :CARDINAL;
+PROCEDURE GetParaCursarTenerCursado ( i :TM.NumeroType ) :TM.ConjMaterias;
+PROCEDURE GetParaCursarTenerAprobado( i :TM.NumeroType ) :TM.ConjMaterias;
+PROCEDURE GetParaRendirTenerCursado ( i :TM.NumeroType ) :TM.ConjMaterias;
+PROCEDURE GetParaRendirTenerAprobado( i :TM.NumeroType ) :TM.ConjMaterias;
+PROCEDURE GetEquivalencias          ( i :TM.NumeroType ) :TM.ConjMaterias;
+
+(* ------------------------------------------------------------------------ *)
+(* Otros procedimientos sobre "Materias"                                    *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE IsTituloMateria( i     :TM.NumeroType;
+                           title :TM.TituloRange ) :BOOLEAN;
+
+PROCEDURE IsMateInPlan(     carr   :TM.CarreraType;
+                            plan   :TM.YearType;
+                            unique :CARDINAL;
+                        VAR mate   :TM.NumeroType ) :BOOLEAN;
+
+PROCEDURE IsCertificableMate( mate   :TM.NumeroType;
+                              plan   :TM.YearType;
+                              titulo :TM.TituloRange ) :BOOLEAN;
+
+PROCEDURE IsCountableMate( mate   :TM.NumeroType;
+                           plan   :TM.YearType;
+                           titulo :TM.TituloRange ) :BOOLEAN;
+
+PROCEDURE GetMaxMatesTitulo( plan   :TM.YearType;
+                             titulo :TM.TituloRange ) :TM.NumeroType;
+
+PROCEDURE GetFirstUniqueMate( carr   :TM.CarreraType;
+                                  plan   :TM.YearType;
+                                  unique :CARDINAL;
+                              VAR mate :TM.NumeroType ) :BOOLEAN;
+PROCEDURE GetNextUniqueMate(     unique :CARDINAL;
+                             VAR mate   :TM.NumeroType ) :BOOLEAN;
+
+PROCEDURE SearchMateria(     carr   :TM.CarreraType;
+                             plan   :TM.YearType;
+                             unique :CARDINAL;
+                             mates  :TM.MateriasType;
+                         VAR index  :TM.RangoMaterias ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos sobre los planes de estudios.                             *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE CtrlPlan( plan :TM.YearType ) :BOOLEAN;
+PROCEDURE WrPlanes();
+PROCEDURE GetPlanes() :CARDINAL;
+
+(*# save, call( result_optional => on ) *)
+PROCEDURE GetPlan( i :CARDINAL; VAR year :TM.YearType ) :BOOLEAN;
+(*# restore *)
+
+PROCEDURE MenuPlanes( x, y :CARDINAL; VAR plan :TM.YearType ) :BOOLEAN;
+(*
+   Devuelve uno de los planes de estudios de la carrera "Carr".
+*)
+
+(* ------------------------------------------------------------------------ *)
+(*   Control de las correlativas de cursadas y de finales.                  *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE CtrlGeneral( VAR alum :TM.AlumType ) :BOOLEAN;
+
+PROCEDURE CtrlRegular( VAR alum :TM.AlumType ) :BOOLEAN;
+
+PROCEDURE CtrlElectoral( min  :DateTime.DateType;
+                         max  :DateTime.DateType;
+                         ano  :CARDINAL;
+                         alum :TM.AlumType ) :BOOLEAN;
+
+PROCEDURE IngresoFinal( plan  :TM.YearType;
+                        mate  :TM.NumeroType;
+                        fecha :DateTime.DateType;
+                        mates :TM.MateriasType ) :BOOLEAN;
+
+PROCEDURE IngCursada(     plan  :TM.YearType;
+                      VAR mate  :TM.MateriaType;
+                          mates :TM.MateriasType )
+                                :BOOLEAN;
+
+PROCEDURE IngFinal(     plan        :TM.YearType;
+                    VAR mate        :TM.MateriaType;
+                        numeroFinal :TM.RangoFinales;
+                        mates       :TM.MateriasType )
+                                    :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos sobre la Facultad y sus carreras.                         *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetNombreFacultad() :TM.FacultadStr;
+PROCEDURE GetNombreCarrera( carr :TM.CarreraType ) :TM.CarreraStr;
+PROCEDURE GetMaxCarreras() :TM.RangoCarreras;
+
+PROCEDURE TituloGenerico( carr  :TM.CarreraType;
+                          title :TM.TituloRange ) :TM.TituloStr;
+
+PROCEDURE TituloOtorgado( carr  :TM.CarreraType;
+                          title :TM.TituloRange ) :TM.TituloStr;
+
+PROCEDURE GetNombresCarreras( VAR carreras :ARRAY OF TM.CarreraStr );
+
+PROCEDURE GetCarrera( x, y :CARDINAL; VAR Carr :TM.CarreraType ) :BOOLEAN;
+
+PROCEDURE GetTitle( x, y :CARDINAL; VAR title :TM.TituloRange ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos y Funciones Generales.                                    *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetOptativa(      x, y :CARDINAL;
+                        VAR alum :TM.AlumType;
+                        VAR id   :TM.NumeroType ) :BOOLEAN;
+
+PROCEDURE GetMate(     x, y :CARDINAL;
+                   VAR alum :TM.AlumType;
+                   VAR key  :TM.KeyType ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Funciones sobre la carrera actual y la Facultad                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE EdCorrelativas();
+PROCEDURE EdPlanes();
+
+PROCEDURE EdFacultad();
+PROCEDURE EdTitulos();
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos de Cambios de planes de estudio.                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetConvert( i :CARDINAL; VAR d :ARRAY OF CHAR; VAR p :TM.ProcType ) :BOOLEAN;
+
+END Carreras.

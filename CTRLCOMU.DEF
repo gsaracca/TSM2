@@ -1,0 +1,40 @@
+DEFINITION MODULE CtrlComun;
+
+IMPORT TM;
+IMPORT DateTime;
+
+PROCEDURE IsExiste(     numero :TM.NumeroType;
+                        year   :TM.YearType;
+                    VAR mates  :TM.MateriasType ) :BOOLEAN;
+
+PROCEDURE Existe(     mate     :TM.NumeroType;
+                      Mates    :TM.MateriasType;
+                  VAR CurAprob :BOOLEAN;
+                  VAR FinAprob :BOOLEAN ) :BOOLEAN;
+
+PROCEDURE Search(     Mates       :TM.MateriasType; (* Materias            *)
+                      Mate        :TM.KeyType;      (* Materia a Buscar    *)
+                  VAR CurAprob    :BOOLEAN;         (* Si Cursada Aprobada *)
+                  VAR FinAprob    :BOOLEAN;         (* Si Final Aprobado   *)
+                  VAR CountFAprob :CARDINAL;        (* Count Finales Aprob *)
+                  VAR CountFDesap :CARDINAL;        (* Count Finales Desap *)
+                  VAR FinalOk     :TM.FinalType )   (* Final Aprobado      *)
+                                  :BOOLEAN;         (* Si Esta la Materia  *)
+
+PROCEDURE SearchIndex(    Mates :TM.MateriasType;   (* Materias                *)
+                          Mate  :TM.KeyType;        (* Materia a Buscar        *)
+                      VAR index :TM.RangoMaterias ) (* lugar donde se encontro *)
+                                :BOOLEAN;
+
+PROCEDURE SearchLibre(    Mates :TM.MateriasType;   (* Materias                *)
+                      VAR index :TM.RangoMaterias ) (* lugar donde se encontro *)
+                                :BOOLEAN;
+
+PROCEDURE SearchFinal( mates :TM.MateriasType; min, max :DateTime.DateType ) :BOOLEAN;
+PROCEDURE SearchParcial(mates:TM.MateriasType; year :CARDINAL ) :BOOLEAN;
+
+PROCEDURE SearchRematric( rematric :TM.RematYearsType; ano :TM.YearType ) :BOOLEAN;
+
+PROCEDURE FinalesVacios( mate :TM.MateriaType ) :CARDINAL;
+
+END CtrlComun.

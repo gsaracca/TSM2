@@ -1,0 +1,57 @@
+DEFINITION MODULE Correlativas;
+
+CONST MinCurso =  1;
+      MaxCurso = 39;
+
+TYPE Name = ARRAY [ 0..40 ] OF CHAR;
+
+     RangoCursos   = SHORTCARD[ MinCurso..MaxCurso ];
+     RangoCursadas = SHORTCARD[ 1..4 ];
+     RangoFinales  = SHORTCARD[ 1..5 ];
+     RangoFinAprob = SHORTCARD[ 1..5 ];
+
+CONST date = '27/05/92';
+
+(* -------------------- *)
+(* Nombre de la Materia *)
+(* -------------------- *)
+
+PROCEDURE GetNombreMateria( Materia :RangoCursos ) :Name;
+
+(* ---------------------------- *)
+(* Correlativas de las Cursadas *)
+(* ---------------------------- *)
+
+PROCEDURE GetCursadaCorrelativaMaxima( Materia :RangoCursos ) :RangoCursadas;
+PROCEDURE GetCursadaCorrelativa( Materia :RangoCursos;
+                                 Cursada :RangoCursadas ) :RangoCursos;
+
+PROCEDURE GetFinalCorrelativoMaximo( Materia :RangoCursos ) :RangoFinales;
+PROCEDURE GetFinalCorrelativo( Materia :RangoCursos;
+                               Final   :RangoFinales ) :RangoCursos;
+
+(* --------------------------- *)
+(* Correlativas de los Finales *)
+(* --------------------------- *)
+
+PROCEDURE GetFinalAprobadoMaximo( Materia :RangoCursos ) :RangoFinAprob;
+PROCEDURE GetFinalAprobado( Materia :RangoCursos;
+                            Final :RangoFinAprob ) :RangoCursos;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos extras de informaci¢n sobre las materias.                 *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetCurso( Materia :RangoCursos ) :CARDINAL;
+PROCEDURE GetCursoStr( Materia :RangoCursos; VAR str :ARRAY OF CHAR );
+(*
+   Devuelve el curso de la materia.
+*)
+
+PROCEDURE GetLibro( Materia :RangoCursos ) :CARDINAL;
+PROCEDURE GetLibroStr( Materia :RangoCursos; VAR str :ARRAY OF CHAR );
+(*
+   Devuelve el libro de la materia.
+*)
+
+END Correlativas.

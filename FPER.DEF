@@ -1,0 +1,9 @@
+DEFINITION MODULE FPer;
+
+IMPORT TM;
+
+PROCEDURE PrntFichaPersonal( alum :TM.AlumType );
+PROCEDURE PrntFichaFull    ( alum :TM.AlumType );
+PROCEDURE PrntFichaFinales ( alum :TM.AlumType );
+
+END FPer.

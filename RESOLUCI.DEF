@@ -1,0 +1,19 @@
+DEFINITION MODULE Resoluciones;
+
+FROM FView IMPORT EditMode, indexType, FileViewGet;
+
+CLASS SearchResol( FileViewGet );
+    SearchComplete :BOOLEAN;
+    VIRTUAL PROCEDURE WrItem( i :CARDINAL );
+    VIRTUAL PROCEDURE Comp( d1, d2 :indexType ) :BOOLEAN;
+    VIRTUAL PROCEDURE GetKeyStr( index :indexType; VAR s :ARRAY OF CHAR );
+END SearchResol;
+
+TYPE ptrResol = POINTER TO ResolClass;
+CLASS ResolClass( SearchResol );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :CARDINAL; VAR d :ARRAY OF BYTE; mode :EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Listados();
+END ResolClass;
+
+END Resoluciones.

@@ -1,0 +1,77 @@
+DEFINITION MODULE PROCQ;
+
+IMPORT TM;
+IMPORT db_cla;
+
+TYPE TituloStr = ARRAY [ 0..31 ] OF CHAR;
+
+TYPE AlumType = RECORD
+        unique      :db_cla.C_LONG;
+        Name        :ARRAY [ 0..SIZE(TM.NameType)-1 ] OF CHAR;
+        LU          :db_cla.C_LONG;
+        TipoDoc     :db_cla.C_SHORT;
+        DNI         :db_cla.C_LONG;
+        DomLocal    :ARRAY [ 0..SIZE(TM.DomicilioType)-1 ] OF CHAR;
+        TE_Local    :ARRAY [ 0..SIZE(TM.TelefonoStr)-1   ] OF CHAR;
+        DomOrigen   :ARRAY [ 0..SIZE(TM.DomicilioType)-1 ] OF CHAR;
+        TE_Origen   :ARRAY [ 0..SIZE(TM.TelefonoStr)-1   ] OF CHAR;
+        CiudadOrig  :ARRAY [ 0..SIZE(TM.CiudadType)-1    ] OF CHAR;
+        Nacimiento  :db_cla.C_DATE;
+        CiudadNac   :ARRAY [ 0..SIZE(TM.CiudadType)-1    ] OF CHAR;
+        ColegioSec  :ARRAY [ 0..SIZE(TM.ColegioType)-1   ] OF CHAR;
+        TituloSec   :ARRAY [ 0..SIZE(TM.TituloSecStr)-1  ] OF CHAR;
+        CiudadCol   :ARRAY [ 0..SIZE(TM.CiudadType)-1    ] OF CHAR;
+        AnoEgreso   :db_cla.C_SHORT;
+        AnoIng      :db_cla.C_SHORT;
+        Carrera     :db_cla.C_SHORT;
+        Titulo      :TituloStr;
+        PlanInicio  :db_cla.C_SHORT;
+        PlanEst     :db_cla.C_SHORT;
+        PlanCorr    :db_cla.C_SHORT;
+        is_regular  :db_cla.C_BYTE;
+        is_egresado :db_cla.C_BYTE;
+        is_rematric :db_cla.C_BYTE;
+        AnoRematric :db_cla.C_SHORT;
+        prom_aprob  :db_cla.C_REAL;
+        prom_desap  :db_cla.C_REAL;
+        aprob       :db_cla.C_SHORT;
+        desaprob    :db_cla.C_SHORT;
+     END; (* AlumType *)
+
+PROCEDURE InitAlumType( VAR alum :AlumType );
+
+TYPE EstadoType = RECORD
+        unique    :db_cla.C_LONG;         (* Documento *)
+        ano       :db_cla.C_SHORT;
+        cur_insc  :db_cla.C_SHORT;
+        cur_aprob :db_cla.C_SHORT;
+        cur_desap :db_cla.C_SHORT;
+        fin_aprob :db_cla.C_SHORT;
+        fin_desap :db_cla.C_SHORT;
+        fin_ausen :db_cla.C_SHORT;
+     END; (* EstadoType *)
+
+PROCEDURE InitEstadoType( VAR est :EstadoType );
+
+TYPE EgreType = RECORD
+        nombre       :ARRAY [ 0..SIZE(TM.NameType)-1 ] OF CHAR;;
+        TipoDoc      :db_cla.C_SHORT;
+        DNI          :db_cla.C_LONG;
+        domicilio    :ARRAY [ 0..SIZE(TM.DomicilioType)-1 ] OF CHAR;;
+        te           :ARRAY [ 0..SIZE(TM.TelefonoStr)-1   ] OF CHAR;;
+        ciudad       :ARRAY [ 0..SIZE(TM.CiudadType)-1    ] OF CHAR;;
+        nacimiento   :db_cla.C_DATE;
+        fecha_egreso :db_cla.C_DATE;
+        fecha_matric :db_cla.C_DATE;
+        ano_ingreso  :db_cla.C_SHORT;
+        promedio     :db_cla.C_REAL;
+        aplazos      :db_cla.C_SHORT;
+        carrera      :db_cla.C_SHORT;
+        titulo       :TituloStr;
+        pidio_equiv  :db_cla.C_BYTE;
+        diferencia   :db_cla.C_SHORT;
+     END; (* EgreType *)
+
+PROCEDURE InitEgreType( VAR egre :EgreType );
+
+END PROCQ.

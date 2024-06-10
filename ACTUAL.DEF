@@ -1,0 +1,8 @@
+DEFINITION MODULE Actual;
+
+IMPORT TM;
+
+PROCEDURE UpDate( VAR alum :TM.AlumType; index :CARDINAL ) :BOOLEAN;
+PROCEDURE VUpDate( VAR alum :TM.AlumType; index :CARDINAL ) :BOOLEAN;
+
+END Actual.

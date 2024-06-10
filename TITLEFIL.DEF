@@ -1,0 +1,36 @@
+DEFINITION MODULE TitleFile;
+
+IMPORT TM;
+
+TYPE TituloFile;
+
+PROCEDURE Init( VAR file :TituloFile );
+PROCEDURE Done( VAR file :TituloFile );
+
+PROCEDURE Load( name :ARRAY OF CHAR; VAR file :TituloFile );
+PROCEDURE Save  ( VAR file :TituloFile );
+PROCEDURE SaveAs( VAR file :TituloFile );
+
+PROCEDURE Export( VAR file :TituloFile );
+
+PROCEDURE EditAlumnos ( VAR file :TituloFile );
+PROCEDURE EditMaterias( VAR file :TituloFile );
+
+PROCEDURE Print1  ( VAR file :TituloFile );
+PROCEDURE Print2  ( VAR file :TituloFile );
+PROCEDURE Print3  ( VAR file :TituloFile );
+PROCEDURE Print4  ( VAR file :TituloFile );
+PROCEDURE PrintAll( VAR file :TituloFile );
+
+PROCEDURE Nil( file :TituloFile ) :BOOLEAN;
+
+PROCEDURE ConvertPR(     index    :CARDINAL;
+                         alum     :TM.AlumType;
+                     VAR new_alum :TituloFile ) :BOOLEAN;
+(*
+   Toma del "Procal II v2.00".
+*)
+
+PROCEDURE NameTitle( file :TituloFile; VAR str :ARRAY OF CHAR );
+
+END TitleFile.

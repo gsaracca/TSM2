@@ -1,0 +1,5 @@
+DEFINITION MODULE InscTool;
+
+PROCEDURE ToolsProc;
+
+END InscTool.

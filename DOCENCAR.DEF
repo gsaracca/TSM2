@@ -1,0 +1,7 @@
+DEFINITION MODULE DocenCargos;
+
+IMPORT TM;
+
+PROCEDURE UpDate( VAR docen :TM.CargosType; index :CARDINAL ) :BOOLEAN;
+
+END DocenCargos.

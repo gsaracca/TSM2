@@ -1,0 +1,68 @@
+DEFINITION MODULE LibroHum;
+
+FROM ATDef IMPORT AnyType;
+FROM EMany IMPORT EditMany;
+FROM FView IMPORT FileViewGet, indexType, EditMode;
+IMPORT KBD;
+
+TYPE LibroType   = [ 0..  1 ];
+     RangoLibros = [ 0..195 ];
+     LibroRec = RECORD
+         LetrasRI :BOOLEAN;
+         num1     :CARDINAL;
+         num2     :CARDINAL;
+     END; (* LibroType *)
+
+CONST NullLibro = LibroRec( FALSE, 0, 0 );
+
+TYPE LibrosType = ARRAY LibroType OF LibroRec;
+     LibrosDef  = ARRAY RangoLibros OF LibrosType;
+
+TYPE MateriaStr = ARRAY [ 0..39 ] OF CHAR;
+     BookRec = RECORD
+          nombre :MateriaStr;
+          libros :LibrosType;
+     END; (* BookRec *)
+
+CONST libro_file = 'librohum';
+
+PROCEDURE InitBook( VAR book :BookRec );
+
+PROCEDURE BookToStr( libro :LibroRec; VAR str :ARRAY OF CHAR );
+
+PROCEDURE GetNombreLibro( index :CARDINAL ) :MateriaStr;
+PROCEDURE GetLibro( index :CARDINAL; (* RangoLibros; *) orden :LibroType ) :LibroRec;
+
+PROCEDURE WrLibro( index :CARDINAL; (* RangoLibros; *) orden :LibroType );
+PROCEDURE PrLibro( index :CARDINAL; (* RangoLibros; *) orden :LibroType );
+
+PROCEDURE LibroToStr( index :CARDINAL; (* RangoLibros; *) orden :LibroType;
+                      VAR str :ARRAY OF CHAR );
+
+TYPE ptrBookFile = POINTER TO BookFile;
+CLASS BookFile( FileViewGet );
+
+    VIRTUAL PROCEDURE Comp( d1, d2 :indexType ) :BOOLEAN;
+    (*
+       Utilizado por el algoritmo de Sort.
+    *)
+
+    VIRTUAL PROCEDURE Compare( VAR d1, d2 :ARRAY OF BYTE ) :INTEGER;
+    (*
+       Utilizado por el algoritmo de Busqueda Binaria.
+    *)
+
+    VIRTUAL PROCEDURE GetKeyStr( i :indexType; VAR s :ARRAY OF CHAR );
+    VIRTUAL PROCEDURE Editar( mode :EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Delete() :BOOLEAN;
+    VIRTUAL PROCEDURE SearchKey( ch :CHAR );
+    VIRTUAL PROCEDURE Search();
+    VIRTUAL PROCEDURE Listados();
+
+    VIRTUAL PROCEDURE WrItem( i :CARDINAL );
+
+END BookFile;
+
+PROCEDURE Books();
+
+END LibroHum.

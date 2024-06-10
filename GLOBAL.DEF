@@ -1,0 +1,76 @@
+DEFINITION MODULE Global;
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Procedimientos sobre variables globales al sistema                       *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Save();
+
+PROCEDURE PedirFinales( val :BOOLEAN );
+PROCEDURE IsPedirFinales() :BOOLEAN;
+
+PROCEDURE PrAnalisis( val :BOOLEAN );
+PROCEDURE IsPrAnalisis() :BOOLEAN;
+
+PROCEDURE FilterMates( val :BOOLEAN );
+PROCEDURE IsFilterMates() :BOOLEAN;
+
+PROCEDURE FinalesManuales( val :BOOLEAN );
+PROCEDURE IsFinalesManuales() :BOOLEAN;
+
+PROCEDURE RoundPromedio( val :BOOLEAN );
+PROCEDURE IsRoundPromedio() :BOOLEAN;
+
+PROCEDURE FacultadInTitulo( val :BOOLEAN );
+PROCEDURE IsFacultadInTitulo() :BOOLEAN;
+
+PROCEDURE CheckHoraFinales( val :BOOLEAN );
+PROCEDURE IsCheckHoraFinales() :BOOLEAN;
+
+PROCEDURE PromediarFinal( val :BOOLEAN );
+PROCEDURE IsPromediarFinal() :BOOLEAN;
+
+PROCEDURE VerificarPlanes( val :BOOLEAN );
+PROCEDURE IsVerificarPlanes() :BOOLEAN;
+
+PROCEDURE VerObservaciones( val :BOOLEAN );
+PROCEDURE IsVerObservaciones() :BOOLEAN;
+
+PROCEDURE HeadFootLProf( val :BOOLEAN );
+PROCEDURE IsHeadFootLProf() :BOOLEAN;
+
+PROCEDURE PedirPermiso( val :BOOLEAN );
+PROCEDURE IsPedirPermiso() :BOOLEAN;
+
+PROCEDURE DobleEspacio( val :BOOLEAN );
+PROCEDURE IsDobleEspacio() :BOOLEAN;
+
+PROCEDURE TribunalEnObs( val :BOOLEAN );
+PROCEDURE IsTribunalEnObs() :BOOLEAN;
+
+PROCEDURE PedirRematric( val :BOOLEAN );
+PROCEDURE IsPedirRematric() :BOOLEAN;
+
+PROCEDURE UsarFilter( val :BOOLEAN );
+PROCEDURE IsUsarFilter() :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Edici¢n de las variables de las opciones.                                *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE OpcionesProcal();
+
+(* ------------------------------------------------------------------------ *)
+(*                                                                          *)
+(* Opciones globales internas al PROCAL (variables vol tiles).              *)
+(*                                                                          *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE ControlVisual( on :BOOLEAN );
+PROCEDURE IsControlVisual() :BOOLEAN;
+
+END Global.

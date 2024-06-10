@@ -1,0 +1,22 @@
+DEFINITION MODULE Ingenieria;
+
+IMPORT ClassCarreras, TM;
+
+TYPE ptrIngenieriaClass = POINTER TO IngenieriaClass;
+CLASS IngenieriaClass( ClassCarreras.CarreraClass );
+    VIRTUAL PROCEDURE IngresoCursada(     plan  :TM.YearType;
+                                          clave :TM.KeyType;
+                                      VAR mates :TM.MateriasType ) :BOOLEAN;
+END IngenieriaClass;
+
+VAR pCarrera :ptrIngenieriaClass;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos generales para PROCTOOLS.                                 *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetConvertProcs(     i    :CARDINAL;
+                           VAR disp :ARRAY OF CHAR;
+                           VAR proc :TM.ProcType   ) :BOOLEAN;
+
+END Ingenieria.

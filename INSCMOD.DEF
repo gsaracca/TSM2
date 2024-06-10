@@ -1,0 +1,23 @@
+DEFINITION MODULE InscMod;
+
+IMPORT TM;
+FROM FView IMPORT FileViewGet, EditMode;
+
+PROCEDURE InscProc();   (* Procedimiento general *)
+
+PROCEDURE AddRemat( index :CARDINAL; VAR al :TM.AlumType ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Internal Class                                                           *)
+(* ------------------------------------------------------------------------ *)
+
+CLASS RematAlum( FileViewGet );
+    VIRTUAL PROCEDURE WrItem( i :LONGCARD; VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Comp( d1, d2 :CARDINAL ) :BOOLEAN;
+    VIRTUAL PROCEDURE GetKeyStr( index :CARDINAL; VAR s :ARRAY OF CHAR );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :LONGCARD; VAR d :ARRAY OF BYTE; VAR km:BOOLEAN; mode :EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Listados();
+END RematAlum;
+
+END InscMod.

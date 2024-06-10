@@ -1,0 +1,9 @@
+DEFINITION MODULE PTITMOD;
+
+IMPORT pdmenu;
+
+PROCEDURE InitMenu( main :BOOLEAN ) :pdmenu.pulldown;
+
+PROCEDURE Proctit();
+
+END PTITMOD.

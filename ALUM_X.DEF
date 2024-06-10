@@ -1,0 +1,337 @@
+DEFINITION MODULE alum_x;
+
+IMPORT Correlativas;
+
+IMPORT Old_Date;
+
+(* ------------------------------------------------------------------------ *)
+(* Informaci¢n acerca del programa.                                         *)
+(* ------------------------------------------------------------------------ *)
+
+(* --------------------------------- *)
+(* N£mero de Nota = 100 DIV 10       *)
+(* --------------------------------- *)
+(*  Visual:   Real:    Coresponde a: *)
+(*    0.0 -->  00 ---->       0      *)
+(*    1.0 -->  10 ---->       1      *)
+(*    2.0 -->  20 ---->       2      *)
+(*    3.0 -->  30 ---->       3      *)
+(*    4.0 -->  40 ---->       4      *)
+(*    5.0 -->  50 ---->       5      *)
+(*    6.0 -->  60 ---->       6      *)
+(*    7.0 -->  70 ---->       7      *)
+(*    8.0 -->  80 ---->       8      *)
+(*    9.0 -->  90 ---->       9      *)
+(*   10.0 --> 100 ---->      10      *)
+(*    A   --> 254 ---->    Ausente   *)
+(*    --  --> 255 ---->   Nota Nula  *)
+(* --------------------------------- *)
+
+(* ------------------------------------- *)
+(* Import Tipos desde el: "Correlativas" *)
+(* ------------------------------------- *)
+
+CONST MinCurso = Correlativas.MinCurso;
+      MaxCurso = Correlativas.MaxCurso;
+
+TYPE RangoCursos = Correlativas.RangoCursos;
+     NameMateria = Correlativas.Name;
+
+CONST GetNameMateria = Correlativas.GetNombreMateria;
+      (* Procedimiento de Tomar el Nombre de la Materia dado su orden *)
+
+(* ----------------------------------------------------------------------- *)
+(* Definici¢n Normal de los Alumnos                                        *)
+(* ----------------------------------------------------------------------- *)
+
+TYPE NotaType = SHORTCARD;
+     YearType = SHORTCARD;
+     NotaStr  = ARRAY [ 0..6 ] OF CHAR;
+
+CONST NullNota = MAX( NotaType );
+      Ausente  = MAX( NotaType ) - 1;
+      NotaMin  =  40;                 (* Nota M¡nima para Aprobar *)
+      NotaMax  = 100;                 (* Nota M xima para Aprobar *)
+
+PROCEDURE SetNullNotaStr( str :ARRAY OF CHAR );
+PROCEDURE SetAusNotaStr ( str :ARRAY OF CHAR );
+
+PROCEDURE WrNota( n :NotaType );
+PROCEDURE WrNotaAt( x, y :CARDINAL; n :NotaType );
+(*
+   Escribe una Nota en la Ventana Correspondiente.
+   Es Truncada a la Parte entera.
+*)
+
+PROCEDURE FullWrNota( n :NotaType );
+PROCEDURE FullWrNotaAt( x, y :CARDINAL; n :NotaType );
+(*
+   Escribe una Nota en la Ventana Correspondiente.
+   "Sin" Truncar la parte entera.
+*)
+
+PROCEDURE PrNota( n :NotaType );
+(*
+   Escribe una Nota en el Archivo Especificado para la Impresora.
+   Es Truncada a la Parte entera.
+*)
+
+PROCEDURE FullPrNota( n :NotaType );
+(*
+   Escribe una nota en el Archivo Especificado para la Impresora.
+   No es truncada.
+*)
+
+PROCEDURE Nota2Str( n :NotaType; VAR str :ARRAY OF CHAR );
+(*
+   Convierte una nota a un String.
+*)
+
+PROCEDURE Str2Nota( str :ARRAY OF CHAR; VAR n :NotaType );
+(*
+   Convierte un String a una Nota.
+*)
+
+PROCEDURE Promedio( n1, n2 :NotaType ) :NotaType;
+(*
+   Calcula el promedio de las dos notas.
+   Controlar la especificaci¢n de la forma de calcular el promedio.
+*)
+
+PROCEDURE MaxNota( n1, n2 :NotaType ) :NotaType;
+(*
+   Devuelve la m xima de las notas.
+*)
+
+(* ------------------------------------------------------------------------ *)
+(* Definici¢n del Registro de Alumnos                                       *)
+(* ------------------------------------------------------------------------ *)
+
+CONST MinParcial = 1;
+      MaxParcial = 4;
+TYPE  RangoParciales = [ MinParcial..MaxParcial ];
+      ParcialesType = ARRAY RangoParciales OF NotaType;
+
+CONST MinFinal = 1;
+      MaxFinal = 4;
+TYPE  RangoFinales = [ MinFinal..MaxFinal ];
+      FinalType = RECORD
+         Nota  :NotaType;
+         Fecha :Old_Date.DateType;
+         Folio :CARDINAL;
+      END;
+      FinalesType = ARRAY RangoFinales OF FinalType;
+
+TYPE  KeyType = RECORD
+         Ano    :YearType;
+         Nombre :RangoCursos;
+      END;
+CONST NullKey = KeyType( 255, 0 );
+      DelKey  = KeyType( 256, 0 );
+
+TYPE  MateriaType = RECORD
+         Clave      :KeyType;
+         Parciales  :ParcialesType;
+         PreFinal   :NotaType;
+         TP         :CHAR;    (* 'a' ==> "Aprobado" | 'd' ==> "Desaprobado" *)
+         Asistencia :CHAR;    (* 'a' ==> "Aprobado" | 'd' ==> "Desaprobado" *)
+         Finales    :FinalesType;
+      END;
+
+CONST MinMateria =  1;
+      MaxMateria = 78;
+TYPE  RangoMaterias = [ MinMateria..MaxMateria ];
+      MateriasType = ARRAY RangoMaterias OF MateriaType;
+
+TYPE DomicilioType   = ARRAY [ 0..31 ] OF CHAR;
+     OrientacionType = ARRAY [ 0..23 ] OF CHAR;
+
+TYPE NameType    = ARRAY [ 0..31 ] OF CHAR; (* Nombre del Alumno   *)
+     LUType      = LONGCARD; (* Libreta Universitaria.:    999,999 *)
+     DNIType     = LONGCARD; (* Documento de Identidad: 99,999,999 *)
+
+TYPE  AlumType = RECORD
+         Name        :NameType;
+         LU          :LUType;
+         DNI         :DNIType;
+         DomLocal    :DomicilioType;
+         DomOrigen   :DomicilioType;
+         AnoIng      :YearType;
+         Plan        :YearType;
+         Orientacion :OrientacionType;
+         Materias    :MateriasType;
+      END; (* AlumType *)
+
+(* ------------------------------------------------------------------------ *)
+(* Registro Internos                                                        *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE PointerType = CARDINAL;
+
+TYPE IndexType = RECORD         (* Registro de los datos a Buscar *)
+         Name    :NameType;
+         LU      :LUType;
+         DNI     :DNIType;
+         Pointer :PointerType;
+     END; (* IndexType *)
+
+(* ------------------------------------------------------------------------ *)
+(* Apartir de la versi¢n 2.00 se elimina el registro interno "AlumnoType"   *)
+(* los datos internos no se diferencian de los externos.                    *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE ReadIndex( i :CARDINAL ) :IndexType;
+PROCEDURE WriteIndex( i :CARDINAL; Index :IndexType );
+(*
+   Lee/Escribe un indice.
+*)
+
+PROCEDURE SetNotOrden();
+(*
+   Pone los indices sin orden.
+*)
+
+(* ------------------------------------------------------------------------ *)
+(* Informaci¢n acerca de los archivos.                                      *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE SizeIndex() :LONGCARD;
+PROCEDURE SizeAlum() :LONGCARD;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos Sobre Alumnos                                             *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE InitMateria() :MateriaType;
+(*
+   Inicializa una Materia Sola.
+*)
+
+PROCEDURE Init( VAR Reg :AlumType );
+(*
+   Inicializa un Registro de Alumnos.
+*)
+
+PROCEDURE PutCurriculum( i :CARDINAL; Alum :AlumType );
+(*
+   Actualiza un Alumno en el lugar determinado por: "index".
+   index: [ 0..FileSize-1 ].
+   Solo Escribe el Curriculum del Alumno.
+   No Afecta al archivo de Indices.
+*)
+
+(*# save, call( result_optional => on ) *)
+PROCEDURE PutByIndex( i :CARDINAL; Reg :AlumType );
+(*
+   Actualiza un Alumno en el lugar determinado por: "index".
+   index: [ 0..FileSize-1 ].
+*)
+
+PROCEDURE GetByIndex( i :CARDINAL; VAR Reg :AlumType ) :BOOLEAN;
+(*
+   i :: [ 0..FileSize-1 ].
+   Toma el dato ordenado por el archivo de indices.
+*)
+(*# restore *)
+
+(* ------------------------------ *)
+(*# save                          *)
+(*# call( result_optional => on ) *)
+PROCEDURE GetDirectAlum( i :CARDINAL; VAR alum :AlumType ) :BOOLEAN;
+(*# restore                       *)
+(* ------------------------------ *)
+(*
+   i :: [ 0..FileSize-1 ].
+   Toma el dato del archivo de principal.
+*)
+
+PROCEDURE GetPointer( i :CARDINAL; VAR pointer :PointerType );
+(*
+   Dado un n£mero de orden de un alumno en el archivo de indices devuelve
+   el n£mero de orden del alumno en el archivo principal.
+*)
+
+PROCEDURE Add( Reg :AlumType );
+(*
+   Agrega un Alumno.
+   Actualiza el GetMaximo.
+*)
+
+PROCEDURE GetMaximo() :CARDINAL;
+(*
+   Toma el m ximo de alumnos en el Archivo Principal.
+   [ 0..FileSize - 1 ].
+*)
+
+PROCEDURE HayAlumnos() :BOOLEAN;
+(*
+   Funci¢n que determina si hay alumnos ingresados.
+*)
+
+CONST NoHayStr = ' No hay alumnos ';
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos de busqueda por c/clave.                                  *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE SearchByName (     name  :NameType;
+                         VAR index :CARDINAL;
+                         VAR Reg   :AlumType ) :BOOLEAN;
+
+PROCEDURE SearchByLU   (     name  :LUType;
+                         VAR index :CARDINAL;
+                         VAR Reg   :AlumType ) :BOOLEAN;
+
+PROCEDURE SearchByDNI  (     name  :DNIType;
+                         VAR index :CARDINAL;
+                         VAR Reg   :AlumType ) :BOOLEAN;
+
+(*
+   Toma un Alumno Buscado por una Determinada Clave.
+   "c": Determina el String a Buscar.
+   Retornando si lo Encontr¢, en la Funci¢n.
+   "index": Determina donde lo Encontr¢.
+   "Reg": Devuelve el Registro Completo si se encontr¢.
+*)
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos de "abrir" y "cerrar" archivos.                           *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Open();  (* Abre   los archivos : procalx.ndx | procalx.dat   *)
+PROCEDURE Close(); (* Cierra los archivos : procalx.ndx | procalx.dat   *)
+PROCEDURE Sync();  (* Sincroniza el archivo : procalx.ndx               *)
+PROCEDURE Check(); (* Checkea la concistencia del archivo : procalx.ndx *)
+
+(* ------------------------------------------------------------------------ *)
+(* Funciones que determinan si esta ordenado o no el archivo por c/clave.   *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE SortName()  :BOOLEAN;
+PROCEDURE SortLU()    :BOOLEAN;
+PROCEDURE SortDNI()   :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos de Sorting para c/clave.                                  *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE SortByName();
+PROCEDURE SortByLU();
+PROCEDURE SortByDNI();
+
+PROCEDURE InitFirst();
+(*
+   Ordeno el archivo de indices segun los parametros del CLI.
+   Versi¢n 1.75 en adelante de Veterinaria.
+   Uso:
+       procal <opcion_sort>
+
+           <opcion_sort> ::= <none> ===> No ordena.
+           <opcion_sort> ::= name   ===> Orden por nombre.
+           <opcion_sort> ::= lu     ===> Orden por Libreta Universitaria.
+           <opcion_sort> ::= dni    ===> Orden por DNI.
+           <opcion_sort> ::= ayuda  ===> Informa de las opciones de sort.
+
+*)
+
+END alum_x.

@@ -1,0 +1,16 @@
+DEFINITION MODULE Types;
+
+TYPE DiccType = RECORD
+         file   :DosName;
+         path   :DosName;
+         driver :
+         fields :ARRAY [ 0..255 ] OF FieldsType;
+         keys   :ARRAY [ 0.. 15 ] OF FieldsType;
+     END; (* DiccType *)
+     AppType = RECORD
+         name :NameType;
+         dicc :DiccType;
+         help :HelpType;
+     END; (* AppType *)
+
+END Types.

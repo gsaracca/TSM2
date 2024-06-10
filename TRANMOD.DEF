@@ -1,0 +1,9 @@
+DEFINITION MODULE TranMod;
+
+PROCEDURE ProcIns_To_Procal();
+PROCEDURE ProcIns_To_Estadistica();
+PROCEDURE ProcIns_To_Biblioteca();
+
+PROCEDURE TranProc();
+
+END TranMod.

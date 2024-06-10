@@ -1,0 +1,31 @@
+DEFINITION MODULE ;
+
+FROM FView IMPORT FileViewGet, IndexType, EditMode;
+
+TYPE ptrProfFile = POINTER TO ProfFile;
+CLASS ProfFile( FileViewGet );
+
+    VIRTUAL PROCEDURE Comp( d1, d2 :IndexType ) :BOOLEAN;
+    (*
+       Utilizado por el algoritmo de Sort.
+    *)
+
+    VIRTUAL PROCEDURE Compare( VAR d1, d2 :ARRAY OF BYTE ) :INTEGER;
+    (*
+       Utilizado por el algoritmo de Busqueda Binaria.
+    *)
+
+    VIRTUAL PROCEDURE GetKeyStr( i :IndexType; VAR s :ARRAY OF CHAR );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :CARDINAL; VAR d :ARRAY OF BYTE; mode :EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Delete() :BOOLEAN;
+    VIRTUAL PROCEDURE SearchKey( ch :CHAR );
+    VIRTUAL PROCEDURE Search();
+    VIRTUAL PROCEDURE Listados();
+
+    VIRTUAL PROCEDURE WrItem( i :CARDINAL; VAR d :ARRAY OF BYTE );
+END ProfFile;
+
+PROCEDURE ProfProc();
+
+END ProfMod.

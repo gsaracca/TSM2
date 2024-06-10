@@ -1,0 +1,97 @@
+DEFINITION MODULE Humanas;
+
+IMPORT ClassCarreras, TM;
+IMPORT DateTime;
+
+TYPE ptrHumanasClass = POINTER TO HumanasClass;
+CLASS HumanasClass( ClassCarreras.CarreraClass );
+
+(* ------------------------------------------------------------------------ *)
+(* Controles generales para Humanas.                                        *)
+(* ------------------------------------------------------------------------ *)
+
+    PROCEDURE CtrlIdioma( VAR mates :TM.MateriasType;
+                              nivel_1_ingles,  lengua_inglesa  :TM.NumeroType;
+                              nivel_1_frances, lengua_francesa :TM.NumeroType
+                        ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Control de Cursadas por Carrera.                                         *)
+(* ------------------------------------------------------------------------ *)
+
+    PROCEDURE CtrlCursadaCsEdu(     plan  :TM.YearType;
+                                    clave :TM.KeyType;
+                                VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    PROCEDURE CtrlCursadaEdIni(     plan  :TM.YearType;
+                                    clave :TM.KeyType;
+                                VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    PROCEDURE CtrlCursadaTrSoc(     plan  :TM.YearType;
+                                    clave :TM.KeyType;
+                                VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    PROCEDURE CtrlCursadaHisto(     plan  :TM.YearType;
+                                    clave :TM.KeyType;
+                                VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    PROCEDURE CtrlCursadaGeogr(     plan  :TM.YearType;
+                                    clave :TM.KeyType;
+                                VAR mates :TM.MateriasType ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Control por carrera de los Finales.                                      *)
+(* ------------------------------------------------------------------------ *)
+
+    PROCEDURE CtrlFinalCsEdu(     plan  :TM.YearType;
+                                  mate  :TM.NumeroType;
+                                  fecha :DateTime.DateType;
+                              VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    PROCEDURE CtrlFinalEdIni(     plan  :TM.YearType;
+                                  mate  :TM.NumeroType;
+                                  fecha :DateTime.DateType;
+                              VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    PROCEDURE CtrlFinalTrSoc(     plan  :TM.YearType;
+                                  mate  :TM.NumeroType;
+                                  fecha :DateTime.DateType;
+                              VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    PROCEDURE CtrlFinalHisto(     plan  :TM.YearType;
+                                  mate  :TM.NumeroType;
+                                  fecha :DateTime.DateType;
+                              VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    PROCEDURE CtrlFinalGeogr(     plan  :TM.YearType;
+                                  mate  :TM.NumeroType;
+                                  fecha :DateTime.DateType;
+                              VAR mates :TM.MateriasType ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Control generico de Cursada y Finales                                    *)
+(* ------------------------------------------------------------------------ *)
+
+
+    VIRTUAL PROCEDURE IngresoCursada(     plan  :TM.YearType;
+                                          clave :TM.KeyType;
+                                      VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    VIRTUAL PROCEDURE IngresoFinal(     plan  :TM.YearType;
+                                        mate  :TM.NumeroType;
+                                        fecha :DateTime.DateType;
+                                    VAR mates :TM.MateriasType ) :BOOLEAN;
+
+END HumanasClass;
+
+VAR pCarrera :ptrHumanasClass;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos generales para PROCTOOLS.                                 *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetConvertProcs(     i    :CARDINAL;
+                           VAR disp :ARRAY OF CHAR;
+                           VAR proc :TM.ProcType   ) :BOOLEAN;
+
+END Humanas.

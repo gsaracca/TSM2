@@ -1,0 +1,13 @@
+DEFINITION MODULE Books;
+
+IMPORT TM;
+
+PROCEDURE Load();
+PROCEDURE Save();
+
+PROCEDURE Get( ls :TM.LibroStr; VAR i :CARDINAL; VAR book :TM.BookType ) :BOOLEAN;
+PROCEDURE Put( i :CARDINAL; VAR book :TM.BookType );
+
+PROCEDURE View();
+
+END Books.

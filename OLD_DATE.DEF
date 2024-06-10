@@ -1,0 +1,202 @@
+DEFINITION MODULE Old_Date;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos sobre fecha.                                              *)
+(* ------------------------------------------------------------------------ *)
+
+IMPORT Lib;
+
+CONST DayType ::= Lib.DayType;
+
+CONST MaxSigloXX  = 36134;           (* Fecha del 31/12/1999. *)
+      MinSigloXXI = MaxSigloXX + 1;  (* Fecha del 01/01/2000. *)
+
+TYPE DateType = CARDINAL;
+     TimeType = CARDINAL;
+     Meses = ( Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio,
+               Agosto, Setiembre, Octubre, Noviembre, Diciembre );
+     FormatType = ( Argentina,    (* dd/mm/aa *)
+                    USA,          (* mm/dd/aa *)
+                    ANSI,         (* aa.mm.dd *)
+                    British,      (* dd/mm/aa *)
+                    French,       (* dd/mm/aa *)
+                    German,       (* dd.mm.aa *)
+                    Italian       (* dd-mm-aa *)
+                  );
+
+PROCEDURE DaysInMonth( m :CARDINAL ) :CARDINAL;
+(*
+   Dado un mes devuelve la cantidad de d¡as de ese mes.
+   (* Ene = 1..Dic = 12 *)
+*)
+
+PROCEDURE SetFormat( format :FormatType );
+PROCEDURE SetCentury( on :BOOLEAN );
+(*
+   if on ---> 19xx.
+         ---> xx.
+*)
+
+PROCEDURE DayOfWeek( date :DateType ) :DayType;
+(*
+   Dado un dia, mes y a¤o la funci¢n devuelve el n£mero del d¡a de la semana.
+*)
+
+PROCEDURE CtrlDate( d, m, a :CARDINAL ) :BOOLEAN;
+(*
+   Control de los valores de la "fecha".
+*)
+
+PROCEDURE DateCompress( d, m, a :CARDINAL ) :DateType;
+(*
+   Comprime una fecha dada por: d¡a, mes y a¤o a un cardinal.
+*)
+
+PROCEDURE DateUnCompress( fecha :DateType; VAR d, m, a :CARDINAL );
+(*
+   Descomprime una fecha en: d¡a, mes, a¤o.
+*)
+
+PROCEDURE WrDate( fecha :DateType );
+(*
+   Escribe la fecha en el formato: dd/mm/aa.
+*)
+
+PROCEDURE PrDate( fecha :DateType );
+(*
+   Imprime la fecha en el formato : "dd/mm/aa".
+*)
+
+
+
+PROCEDURE GetDate( VAR fecha :DateType );
+(*
+   Toma la fecha del sistema y la comprime.
+*)
+
+PROCEDURE GetDateCard( VAR d, m, a :CARDINAL );
+(*
+   Toma la fecha del sistema y la devuelve como d¡a, mes y a¤o.
+*)
+
+
+PROCEDURE GetDateStr( VAR d, m, a :ARRAY OF CHAR );
+(*
+   Tomo la fecha del sistema en un "string's".
+*)
+
+PROCEDURE DateToFormatStr( f :DateType; VAR s :ARRAY OF CHAR );
+(*
+   Convierte la fecha : "f" a un string : "s".
+   Con el formato : seleccionado.
+*)
+
+PROCEDURE DateToStr( d :DateType; VAR s :ARRAY OF CHAR );
+(*
+   Convierte un fecha : "f" a un string : "s".
+   Con el formato : "aa/mm/dd".
+*)
+
+PROCEDURE Dia( i :DayType; VAR dStr :ARRAY OF CHAR );
+(*
+   Toma el d¡a indicado por : "i".
+*)
+
+PROCEDURE Mes( i :CARDINAL; VAR mStr :ARRAY OF CHAR );
+(*
+   Toma el mes indicado por : "i".
+*)
+
+PROCEDURE GetDia( VAR dStr :ARRAY OF CHAR );
+(*
+   Tomo el dia actual y lo devuelve en un string.
+*)
+
+PROCEDURE GetMes( VAR mStr :ARRAY OF CHAR );
+(*
+   Toma el mes actual y lo devuelve en un string.
+*)
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos sobre hora                                                *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE HMSType =  (          (* IF PM    *)      (*  IF ~ PM        *)
+                  _H,      (* hh       *)      (*  hh PM/AM       *)
+                  _HM,     (* hh:mm    *)      (*  hh:mm PM/AM    *)
+                  _HMS     (* hh:mm:ss *)      (*  hh:mm:ss PM/AM *)
+                );
+
+PROCEDURE SetHMS( hms :HMSType );
+PROCEDURE SetPM( on :BOOLEAN );
+
+PROCEDURE CtrlTime( h, m, s :CARDINAL ) :BOOLEAN;
+(*
+   Control de los valores de la "hora".
+*)
+
+PROCEDURE WrTime( time :CARDINAL );
+PROCEDURE PrTime( time :CARDINAL );
+(*
+   Imprimir al hora por la pantalla o por la impresora.
+*)
+
+
+
+PROCEDURE GetTime( VAR hora :TimeType );
+(*
+   Toma la hora del sistema y la comprime.
+*)
+
+PROCEDURE GetTimeCard( VAR h, m, s :CARDINAL );
+(*
+   Tomo la hora del sistema en "cardinales".
+*)
+
+PROCEDURE GetTimeStr( VAR h, m, s :ARRAY OF CHAR );
+(*
+   Tomo la hora del sistema en "string's".
+*)
+
+PROCEDURE TimeToFormatStr( t :TimeType; VAR s :ARRAY OF CHAR );
+(*
+   Convierte la hora : "t" a un string : "s".
+   Con el formato : seleccionado.
+*)
+
+PROCEDURE TimeToStr( t :TimeType; VAR s :ARRAY OF CHAR );
+(*
+   Convierte un hora : "t" a un string : "s".
+   Con el formato : "hh:mm:ss".
+*)
+
+PROCEDURE DateDosCompress( d, m, a :CARDINAL ) :CARDINAL;
+PROCEDURE DateDosUnCompress( fecha :CARDINAL; VAR d, m, a :CARDINAL );
+PROCEDURE GetDateDos() :CARDINAL;
+(*
+   Comprime y descomprime una fecha en formato del DOS a "d¡a, mes y a¤o".
+*)
+
+PROCEDURE TimeDosCompress( h, m, s :CARDINAL ) :CARDINAL;
+PROCEDURE TimeDosUnCompress( hora :CARDINAL; VAR h, m, s :CARDINAL );
+PROCEDURE GetTimeDos() :CARDINAL;
+(*
+   Comprime y descomprime una hora en formato del DOS a "hora, min y seg".
+*)
+
+CONST TimeCompress   ::= TimeDosCompress;
+      TimeUnCompress ::= TimeDosUnCompress;
+
+(* ------------------------------------------------------------------------ *)
+(* Compatibilidad con MyLib 1.00                                            *)
+(* ------------------------------------------------------------------------ *)
+
+CONST WrFecha  ::= WrDate;
+      PrFecha  ::= PrDate;
+      DateCard ::= GetDateCard;
+      WrHora   ::= WrTime;
+      PrHora   ::= PrTime;
+      IngFecha ::= DateCompress;
+      RecFecha ::= DateUnCompress;
+
+END Old_Date.

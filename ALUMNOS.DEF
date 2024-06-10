@@ -1,0 +1,10 @@
+DEFINITION MODULE Alumnos;
+
+PROCEDURE AlumProc();
+PROCEDURE AlumVProc();
+PROCEDURE ExpoAlumProcPROCQ();
+PROCEDURE ExpoAlumProcDBF();
+PROCEDURE ExpoAlumProcFULL();
+PROCEDURE ExpoAlumProcHTML();
+
+END Alumnos.

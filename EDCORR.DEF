@@ -1,0 +1,26 @@
+DEFINITION MODULE EdCorr;
+
+IMPORT TM;
+IMPORT Win;
+FROM GView IMPORT View;
+
+CLASS MarkMate( View );
+    w         :Win.window;
+    index     :TM.NumeroType;
+    conj      :TM.ConjMaterias;
+    mates     :POINTER TO TM.MatesCorrType;
+    same_plan :BOOLEAN;
+    Msg       :BOOLEAN;
+    PROCEDURE Init(     tit :ARRAY OF CHAR;
+                        in  :TM.NumeroType;
+                        co  :TM.ConjMaterias;
+                    VAR ms  :TM.MatesCorrType;
+                        sp  :BOOLEAN );
+    PROCEDURE CheckMark( i :CARDINAL ) :BOOLEAN;
+    PROCEDURE WrCheck( i :CARDINAL );
+    VIRTUAL PROCEDURE WrMethod( i :LONGCARD );
+    PROCEDURE Execute( VAR c :TM.ConjMaterias ) :BOOLEAN;
+    PROCEDURE Close();
+END MarkMate;
+
+END EdCorr.

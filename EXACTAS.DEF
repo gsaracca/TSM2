@@ -1,0 +1,44 @@
+DEFINITION MODULE Exactas;
+
+IMPORT ClassCarreras, TM, DateTime;
+
+TYPE ptrExactasClass = POINTER TO ExactasClass;
+CLASS ExactasClass( ClassCarreras.CarreraClass );
+
+(* ------------------------------------------------------------------------ *)
+(* Control general para esta Facultad.                                      *)
+(* ------------------------------------------------------------------------ *)
+
+    VIRTUAL PROCEDURE CtrlGeneral( VAR alum :TM.AlumType ) :BOOLEAN;
+
+    PROCEDURE IfAprobMenosCuatro( mate  :TM.NumeroType;
+                                  plan  :TM.YearType;
+                                  mates :TM.MateriasType ) :BOOLEAN;
+
+
+(* ------------------------------------------------------------------------ *)
+(* Control generico de Cursada y Finales                                    *)
+(* ------------------------------------------------------------------------ *)
+
+    VIRTUAL PROCEDURE IngresoCursada(     plan  :TM.YearType;
+                                          clave :TM.KeyType;
+                                      VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    VIRTUAL PROCEDURE IngresoFinal(     plan  :TM.YearType;
+                                        mate  :TM.NumeroType;
+                                        fecha :DateTime.DateType;
+                                    VAR mates :TM.MateriasType ) :BOOLEAN;
+
+END ExactasClass;
+
+VAR pCarrera :ptrExactasClass;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos generales para PROCTOOLS.                                 *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetConvertProcs(     i    :CARDINAL;
+                           VAR disp :ARRAY OF CHAR;
+                           VAR proc :TM.ProcType   ) :BOOLEAN;
+
+END Exactas.

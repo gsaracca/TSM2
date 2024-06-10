@@ -1,0 +1,24 @@
+DEFINITION MODULE TCurrent;
+
+PROCEDURE AppendProc();
+PROCEDURE CopyProc();
+PROCEDURE MakeProc();
+
+PROCEDURE MergeProc();
+PROCEDURE DelProc();
+PROCEDURE ExtProc();
+PROCEDURE VerProc();
+PROCEDURE MakeSexo();
+
+PROCEDURE SearchAlum();
+
+PROCEDURE EgreDelProc();
+
+PROCEDURE GenProc();
+PROCEDURE ControlMates();
+PROCEDURE CheckMates();
+
+PROCEDURE ResetItems();
+PROCEDURE GetItem( VAR disp :ARRAY OF CHAR; VAR proc :PROC ) :BOOLEAN;
+
+END TCurrent.

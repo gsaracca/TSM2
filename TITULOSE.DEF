@@ -1,0 +1,36 @@
+DEFINITION MODULE TituloSec;
+
+FROM GTab  IMPORT Tab;
+FROM FView IMPORT FileViewGet, EditMode;
+
+PROCEDURE InitPointerTituloSec();
+PROCEDURE DonePointerTituloSec();
+
+TYPE ptrTituloSec = POINTER TO TituloSecClass;
+CLASS TituloSecClass( Tab );
+    PROCEDURE Init( x, y :CARDINAL; gMsg :ARRAY OF CHAR; gVal :CARDINAL );
+END TituloSecClass;
+
+(*# save, call( result_optional => on ) *)
+PROCEDURE OpenFile() :BOOLEAN;
+(*# restore *)
+PROCEDURE CloseFile();
+
+PROCEDURE GetTituloSec( tit_sec :CARDINAL; VAR name :ARRAY OF CHAR );
+
+(* ------------------------------------------------------------------------ *)
+(* Internal Class                                                           *)
+(* ------------------------------------------------------------------------ *)
+
+CLASS TituloSecFile( FileViewGet );
+    VIRTUAL PROCEDURE GetKeyStr( i :CARDINAL; VAR s :ARRAY OF CHAR );
+    VIRTUAL PROCEDURE WrItem( i :LONGCARD; VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :LONGCARD; VAR d :ARRAY OF BYTE; VAR km :BOOLEAN; mode :EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Comp( d1, d2 :CARDINAL ) :BOOLEAN;
+    VIRTUAL PROCEDURE CompData( VAR d1 :ARRAY OF BYTE;
+                                    d2 :CARDINAL ) :INTEGER;
+END TituloSecFile;
+
+
+END TituloSec.

@@ -1,0 +1,286 @@
+DEFINITION MODULE OldTypes;
+
+FROM Old_Date    IMPORT DateType, TimeType;
+FROM Nota        IMPORT NotaType;
+(* FROM Ciudades    IMPORT CiudadType;    *)
+(* FROM TituloSec   IMPORT TituloSecType; *)
+
+TYPE LibroType = [0..1];
+
+TYPE RangeCarreras = SHORTCARD[ 0..5 ];
+     CarreraType   = RangeCarreras;
+
+VAR MaxCarreras :RangeCarreras; (* CarreraType; *)
+
+TYPE TituloType  = (
+                     licprof,
+                     prof,
+                     lic,
+                     nada
+                   );
+
+TYPE CarreraStr = ARRAY [ 0..31 ] OF CHAR;
+
+TYPE NumeroType = SHORTCARD;
+
+TYPE KeyType = RECORD
+         numero :NumeroType;
+         fecha  :DateType;
+     END;
+
+CONST NullKey = KeyType( MAX( NumeroType ), 0 );
+
+(*# save, data( packed => on ) *)
+CONST Cuat_1 = 0; (* Or anual. *)
+      Cuat_2 = 1;
+
+TYPE RegimenType = [ 0..  1 ];
+     NumResType  = [ 0..512 ];
+     YearType    = [ 0.. 99 ];
+
+TYPE ResType = RECORD
+         numero :NumResType;  (* n£mero de la resoluci¢n. *)
+         ano    :YearType;    (* a¤o de la resoluci¢n.    *)
+     END;
+
+TYPE  RangoParciales = [ 0..3 ];
+      ParcialesType = ARRAY RangoParciales OF NotaType;
+      CursadaType = RECORD
+         Parciales  :ParcialesType;
+         Otra       :NotaType;
+         Resolucion :ResType;
+      END;
+
+TYPE  LlamadoType  = [ 0..15 ];
+      FolioType    = [ 0..1023 ];
+      FinalType = RECORD
+          Nota       :NotaType;
+          Fecha      :DateType;
+          Llamado    :LlamadoType;
+          Folio      :FolioType;
+          Libro      :LibroType;
+          Resolucion :ResType;
+      END;
+      RangoFinales = [ 0..5 ];
+      FinalesType = ARRAY RangoFinales OF FinalType;
+
+TYPE ObservacionesType = ARRAY [ 0..19 ] OF CHAR;
+     MateriaType = RECORD
+         Clave         :KeyType;
+         Condicional   :BOOLEAN;
+         Cursada       :CursadaType;
+         Finales       :FinalesType;
+         Observaciones :ObservacionesType;
+      END;
+      RangoMaterias = [ 0..59 ]; (* para todos menos para sociales *)
+      MateriasType = ARRAY RangoMaterias OF MateriaType;
+
+TYPE MateriaStr = ARRAY [ 0..39 ] OF CHAR;
+(*# restore *)
+
+(*
+   Registro de alumno.
+*)
+
+CONST archivoAlumnos = 'alumnos';
+
+TYPE  DomicilioType = ARRAY [ 0..24 ] OF CHAR;
+      ColegioType   = ARRAY [ 0..24 ] OF CHAR;
+
+TYPE NameType    = ARRAY [ 0..29 ] OF CHAR; (* Nombre del Alumno      *)
+     LUType      = LONGCARD;                (* Libreta Universitaria  *)
+     DNIType     = LONGCARD;                (* Documento de Identidad *)
+
+TYPE  AlumType = RECORD
+         Name        :NameType;
+         LU          :LUType;
+         DNI         :DNIType;
+         DomLocal    :DomicilioType;
+         DomOrigen   :DomicilioType;
+         CiudadOrig  :CARDINAL;
+         Nacimiento  :DateType;
+         CiudadNac   :CARDINAL;
+         ColegioSec  :ColegioType;
+         TituloSec   :CARDINAL;
+         CiudadCol   :CARDINAL;
+         AnoEgreso   :YearType;
+         AnoIng      :YearType;
+         Carrera     :CarreraType;
+         Titulo      :TituloType;
+         PlanEst     :YearType;
+         PlanCorr    :YearType;
+         Materias    :MateriasType;
+      END;
+
+CONST SizeAlumno = LONGCARD( SIZE( AlumType ) );
+
+PROCEDURE InitFinal()    :FinalType;
+PROCEDURE InitMateria()  :MateriaType;
+PROCEDURE InitMaterias() :MateriasType;
+PROCEDURE InitAlum( VAR al :AlumType );
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos y Funciones sobre Resoluciones.                           *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE InitRes() :ResType;
+PROCEDURE IsNullRes( res :ResType ) :BOOLEAN;
+PROCEDURE ResToStr( res :ResType; VAR str :ARRAY OF CHAR );
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos sobre la pausa.                                           *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Pausa( val :BOOLEAN );
+PROCEDURE IsPausa() :BOOLEAN;
+PROCEDURE WrPause();
+
+(* ------------------------------------------------------------------------ *)
+(* Datos sobre actas de finales del PROCEX.                                 *)
+(* ------------------------------------------------------------------------ *)
+
+CONST MaxPage        =  26 - 1;  (* 26 TypesModulenos por p gina. *)
+      MaxTypesModule = 208 - 1;  (* 26 alumnos por acta == 8 actas ==> 8 * 26 = 234. *)
+      MaxActa        = MaxTypesModule DIV MaxPage; (* 9 p ginas por acta. *)
+
+TYPE PagesRange = [ 0..MaxPage ];
+     ActasRange = [ 0..MaxActa ];
+
+TYPE LineType = RECORD
+         used     :BOOLEAN;
+         nombre   :NameType;
+         index    :CARDINAL;            (* puntero al alumno en el archivo *)
+         carrera  :CarreraType;
+         num_mate :NumeroType;
+         res      :ResType;
+         lu       :LUType;
+         dni      :DNIType;
+         escrito  :NotaType;
+         oral     :NotaType;
+         calif    :NotaType;
+     END; (* LineType *)
+     CursoType       = ARRAY [ 0.. 8 ] OF CHAR;
+     LlamadoStr      = ARRAY [ 0..24 ] OF CHAR;
+     TipoExamenType  = ( regular, libre );
+     ObservacionType = ARRAY [ 0..39 ] OF CHAR;
+     ProfesoresRange = [ 0..7 ];
+     ProfesoresType  = ARRAY ProfesoresRange OF CARDINAL;
+     AlumnosRange    = [ 0..MaxTypesModule ];
+     AlumnosType     = ARRAY AlumnosRange OF LineType;
+     ActaType = RECORD
+         transfer     :BOOLEAN;
+         name_mate    :MateriaStr;
+         area         :CARDINAL; (* indice al archivo de areas. *)
+         curso        :CursoType;
+         fecha        :DateType;
+         hora         :TimeType;
+         orden        :CARDINAL;
+         libro_index  :CARDINAL; (* indice del libro en el archivo de libros *)
+         libro_orden  :CARDINAL;
+         folio        :CARDINAL;
+         llamado      :LlamadoStr;
+         tipo_examen  :TipoExamenType;
+         observacion1 :ObservacionType;
+         observacion2 :ObservacionType;
+         observacion3 :ObservacionType;
+         profesores   :ProfesoresType;
+         alumnos      :AlumnosType;
+     END; (* ActaType *)
+
+PROCEDURE InitLine( VAR line :LineType );
+PROCEDURE InitEx( VAR acta :ActaType );
+
+PROCEDURE IsLineNull( l :LineType ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Datos para PROCTIT.                                                      *)
+(* ------------------------------------------------------------------------ *)
+
+CONST FileExt = 'ti3';
+
+(* ------------------------------------------------------------------------ *)
+(* Datos para DOCENTES.                                                     *)
+(* ------------------------------------------------------------------------ *)
+
+TYPE DocType = ( DNI, LC, LE, PAS );
+     CarType = ( Tit, Adj, Asoc, JTP, Ay1ra, Ay2da );
+     DedType = ( Adhonorem, Simple, Semi, Exclusiva );
+     SitType = ( Ordinario, Interino );
+     PosType = ( Si, No, Realizando );
+
+PROCEDURE DocToStr( doc :DocType; VAR str :ARRAY OF CHAR );
+PROCEDURE CarToStr( car :CarType; VAR str :ARRAY OF CHAR );
+PROCEDURE DedToStr( ded :DedType; VAR str :ARRAY OF CHAR );
+PROCEDURE SitToStr( sit :SitType; VAR str :ARRAY OF CHAR );
+PROCEDURE PosToStr( pos :PosType; VAR str :ARRAY OF CHAR );
+
+PROCEDURE WrDoc( doc :DocType; l :INTEGER );
+PROCEDURE WrCar( car :CarType; l :INTEGER );
+PROCEDURE WrDed( ded :DedType; l :INTEGER );
+PROCEDURE WrSit( sit :SitType; l :INTEGER );
+PROCEDURE WrPos( pos :PosType; l :INTEGER );
+
+PROCEDURE PrDoc( doc :DocType; l :INTEGER );
+PROCEDURE PrCar( car :CarType; l :INTEGER );
+PROCEDURE PrDed( ded :DedType; l :INTEGER );
+PROCEDURE PrSit( sit :SitType; l :INTEGER );
+PROCEDURE PrPos( pos :PosType; l :INTEGER );
+
+TYPE MateType = RECORD
+          Used       :BOOLEAN;
+          Nombre     :CARDINAL;  (* indexed *)
+          Porcentaje :CARDINAL;
+     END;
+     RangoMates = [ 0..9 ];
+     MatesType = ARRAY RangoMates OF MateType;
+     CargoType = RECORD
+           Used       :BOOLEAN;
+           Cargo      :CarType;
+           Dedicacion :DedType;
+           Situacion  :SitType;
+           Hs_doc     :CARDINAL;
+           Hs_inv     :CARDINAL;
+           Hs_ext     :CARDINAL;
+           Materias   :MatesType;
+     END; (* CargosType *)
+     RangoCargos = [ 0..6 ];
+     CargosType = ARRAY RangoCargos OF CargoType;
+     DocenType = RECORD
+          Nombre    :NameType;
+          Tipo_doc  :DocType;
+          Num_doc   :DNIType;
+          Domicilio :DomicilioType;
+          Ciudad    :CARDINAL;    (* indexed *)
+          PostGrado :PosType;
+          Otros     :ARRAY [ 0..1 ] OF BOOLEAN;
+          Cargos    :CargosType;
+     END;
+
+PROCEDURE InitMate  ( VAR m :MateType   );
+PROCEDURE InitMates ( VAR m :MatesType  );
+PROCEDURE InitCargo ( VAR c :CargoType  );
+PROCEDURE InitCargos( VAR c :CargosType );
+PROCEDURE InitDocen ( VAR d :DocenType  );
+
+TYPE HistStr = ARRAY [ 0..50 ] OF CHAR;
+     HistoriaType = RECORD
+         Docente    :CARDINAL;       (* pointer "indexed" *)
+         Resolucion :ResType;
+         Cargos     :HistStr;
+         Materias   :HistStr;
+         Comentario :HistStr;
+     END; (* HistoriaType *)
+
+PROCEDURE InitHist() :HistoriaType;
+
+TYPE DocenResType = RECORD
+         numero  :CARDINAL;
+         ano     :CARDINAL;
+         fecha   :DateType;
+         docente :CARDINAL;     (* indexed *)
+         cargos  :CargosType;
+     END;
+
+PROCEDURE InitDocenRes() :DocenResType;
+
+END OldTypes.

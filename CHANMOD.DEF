@@ -1,0 +1,21 @@
+DEFINITION MODULE ChanMod;
+
+IMPORT TM;
+IMPORT FView, KBD;
+
+PROCEDURE GetConvert( i :CARDINAL; VAR d :ARRAY OF CHAR; VAR p :PROC ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Internal Class                                                           *)
+(* ------------------------------------------------------------------------ *)
+
+CLASS file_proc( FView.FileView );
+    tag_records :TM.set_of_card;
+    Process     :TM.ProcType;
+    PROCEDURE SetProcess( process :TM.ProcType );
+    VIRTUAL PROCEDURE WrItem( i :LONGCARD; VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Select() :KBD.KeyType;
+    VIRTUAL PROCEDURE GetKeyStr( i :CARDINAL; VAR str :ARRAY OF CHAR );
+END file_proc;
+
+END ChanMod.

@@ -1,0 +1,24 @@
+DEFINITION MODULE Docen;
+
+FROM FView IMPORT EditMode, FileViewGet;
+
+CLASS SearchDocen( FileViewGet );
+    SearchComplete :BOOLEAN;
+    VIRTUAL PROCEDURE WrItem( i :LONGCARD; VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE SearchKey( key :CHAR );
+    VIRTUAL PROCEDURE Search();
+    VIRTUAL PROCEDURE Comp( d1, d2 :CARDINAL ) :BOOLEAN;
+    VIRTUAL PROCEDURE GetKeyStr( index :CARDINAL; VAR s :ARRAY OF CHAR );
+    VIRTUAL PROCEDURE CompData( VAR d1 :ARRAY OF BYTE;
+                                    d2 :CARDINAL ) :INTEGER;
+    VIRTUAL PROCEDURE Compare( VAR a, b :ARRAY OF BYTE ) :INTEGER;
+END SearchDocen;
+
+TYPE ptrDocen = POINTER TO DocenClass;
+CLASS DocenClass( SearchDocen );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :LONGCARD; VAR d :ARRAY OF BYTE; VAR key_mod :BOOLEAN; mode :EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Listados();
+END DocenClass;
+
+END Docen.

@@ -1,0 +1,14 @@
+DEFINITION MODULE Anexo;
+
+IMPORT TM, DateTime;
+
+PROCEDURE OpenForWrite( _name :ARRAY OF CHAR );
+PROCEDURE AddMateria( ano            :CARDINAL;
+                      materia        :ARRAY OF CHAR;
+                      f0, f1, f2, f3 :DateTime.DateType;
+                      hora           :DateTime.TimeType;
+                      profesores     :TM.ProfesoresType );
+PROCEDURE Write();
+PROCEDURE Close();
+
+END Anexo.

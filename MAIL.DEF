@@ -1,0 +1,15 @@
+DEFINITION MODULE Mail;
+
+IMPORT DateTime;
+
+PROCEDURE OpenForWrite( _name :ARRAY OF CHAR; _filter :BOOLEAN );
+PROCEDURE AddProfesor( name :ARRAY OF CHAR );
+PROCEDURE AddMateria( materia        :ARRAY OF CHAR;
+                      f0, f1, f2, f3 :DateTime.DateType;
+                      hora           :DateTime.TimeType;
+                      cargo          :BOOLEAN;
+                      alumnos        :CARDINAL );
+PROCEDURE Write();
+PROCEDURE Close();
+
+END Mail.

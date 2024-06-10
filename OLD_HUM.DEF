@@ -1,0 +1,24 @@
+DEFINITION MODULE Humanas;
+
+IMPORT ClassCarreras, TypesModule;
+IMPORT DateTime;
+
+CONST TrSocial = 1;
+
+TYPE ptrHumanasClass = POINTER TO HumanasClass;
+CLASS HumanasClass( ClassCarreras.CarreraClass );
+
+    VIRTUAL PROCEDURE IngresoCursada( plan  :TypesModule.YearType;
+                                      clave :TypesModule.KeyType;
+                                      mates :TypesModule.MateriasType ) :BOOLEAN;
+
+    VIRTUAL PROCEDURE IngresoFinal( plan  :TypesModule.YearType;
+                                    mate  :TypesModule.NumeroType;
+                                    fecha :DateTime.DateType;
+                                    mates :TypesModule.MateriasType ) :BOOLEAN;
+
+END HumanasClass;
+
+VAR pCarrera :ptrHumanasClass;
+
+END Humanas.

@@ -1,0 +1,9 @@
+DEFINITION MODULE PTOOLMOD;
+
+IMPORT pdmenu;
+
+PROCEDURE InitMenu( main :BOOLEAN ) :pdmenu.pulldown;
+
+PROCEDURE Proctools();
+
+END PTOOLMOD.

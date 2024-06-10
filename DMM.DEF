@@ -1,0 +1,23 @@
+DEFINITION MODULE DMM;
+
+IMPORT TM, DateTime;
+
+(*
+   M¢dulo de Manejo de Directorios de Materias.
+*)
+
+(*# save, call( o_a_copy => on ) *)
+PROCEDURE GetDatosMateria(      fileStr     :ARRAY OF CHAR;
+                                filter      :BOOLEAN;
+                                filter_year :TM.YearType;
+                            VAR numero      :TM.NumeroType;
+                            VAR fecha       :DateTime.DateType;
+                            VAR year        :TM.YearType ) :BOOLEAN;
+(*# restore *)
+
+PROCEDURE Select( Main :BOOLEAN; Carr :TM.CarreraType );
+(*
+   Selecciona el directorio de la carrera : "Carr".
+*)
+
+END DMM.

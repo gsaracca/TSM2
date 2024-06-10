@@ -1,0 +1,209 @@
+DEFINITION MODULE db_hgs;
+
+IMPORT db_mdb, FM;
+
+(*    tipo      ID    M2-Type      nul size  Key? Auto? Upp? QBE? *)
+
+CONST int    =  0; (* integer       0   2    K    A     -    Y *)
+      lint   =  1; (* longint       0   4    K    A     -    Y *)
+      scard  =  2; (* shortcard     0   1    K    A     -    Y *)
+      card   =  3; (* cardinal      0   2    K    A     -    Y *)
+      lcard  =  4; (* longcard      0   4    K    A     -    Y *)
+      date   =  5; (* longcard      0   4    K    A     -    Y *)
+      time   =  6; (* longcard      0   4    K    A     -    Y *)
+      real   =  7; (* longreal      0   8    K    -     -    Y *)
+      memo   =  8; (* longcard      0   4    -    -     -    - *)
+      select =  9; (* bitset        0   2    -    -     -    - *)
+      text   = 10; (* array of char 0 long   K    -     U    Y *)
+      binary = 11; (* array of byte 0 size   -    -     -    - *)
+
+CONST MaxFields    = 127;
+      MaxKeyFields =   7;
+      MaxKeys      =  15;
+
+TYPE FieldStr    = ARRAY [ 0..31 ] OF CHAR;
+     FieldTipo   = CARDINAL;
+     FieldSize   = CARDINAL;
+     FieldOffSet = CARDINAL;
+     FieldAddr   = ADDRESS;
+     KeyID       = [ 0..MaxKeys      ];
+     KeyFieldID  = [ 0..MaxKeyFields ];
+     FieldID     = [ 0..MaxFields    ];
+
+TYPE FieldType = RECORD
+        name   :FieldStr;
+        type   :FieldTipo;
+        size   :FieldSize;
+        offset :FieldOffSet;
+        ptr    :FieldAddr;
+     END; (* FieldType *)
+
+TYPE KeyFieldType = RECORD
+        field_num :FieldID;
+        key_type  :( auto, sense, normal );
+     END; (* KeyType *)
+     KeyType = ( key, index, dynamic );
+     KeysType = RECORD
+         primary   :BOOLEAN;
+         type      :KeyType;
+         unique    :BOOLEAN;
+         excl_null :BOOLEAN;
+         fields    :ARRAY KeyFieldID OF KeyFieldType;
+     END; (* KeysType *)
+
+TYPE ErrorType = CARDINAL;
+
+CLASS Base;
+    fpath      :FM.PathStr;
+    fname      :FM.PathStr;
+
+    rec_size   :CARDINAL;
+    buffer     :POINTER TO FM.DataType;
+
+    max_fields :CARDINAL;
+    fields     :ARRAY FieldID OF FieldType;
+
+    cur_key    :KeyID;
+    max_keys   :KeyID;
+    key        :ARRAY KeyID OF KeyType;
+
+    PROCEDURE Init();
+
+(* ------------------------------------------------------------------------ *)
+(* Agregar tipos de datos a la base de datos.                               *)
+(* ------------------------------------------------------------------------ *)
+
+    PROCEDURE add_field_int   ( name :FieldStr );
+    PROCEDURE add_field_lint  ( name :FieldStr );
+    PROCEDURE add_field_byte  ( name :FieldStr );
+    PROCEDURE add_field_card  ( name :FieldStr );
+    PROCEDURE add_field_lcard ( name :FieldStr );
+    PROCEDURE add_field_date  ( name :FieldStr );
+    PROCEDURE add_field_time  ( name :FieldStr );
+    PROCEDURE add_field_real  ( name :FieldStr );
+    PROCEDURE add_field_bool  ( name :FieldStr );
+    PROCEDURE add_field_memo  ( name :FieldStr );
+    PROCEDURE add_field_select( name :FieldStr );
+    PROCEDURE add_field_text  ( name :FieldStr; size :FieldSize );
+    PROCEDURE add_field_binary( name :FieldStr; size :FieldSize );
+
+    PROCEDURE init_field( name :FieldStr );
+    PROCEDURE init_rec();
+    PROCEDURE get_field  ( field :FieldType; VAR rec :ARRAY OF BYTE );
+    PROCEDURE put_field  ( field :FieldType; VAR rec :ARRAY OF BYTE );
+    PROCEDURE get_field_s( field :FieldStr;  VAR rec :ARRAY OF BYTE );
+    PROCEDURE put_field_s( field :FieldStr;  VAR rec :ARRAY OF BYTE );
+
+    PROCEDURE def_index( num :CARDINAL; string_def :ARRAY OF CHAR );
+
+    PROCEDURE fields_count() :CARDINAL;
+    PROCEDURE field_name( i :CARDINAL; VAR name :ARRAY OF CHAR );
+    PROCEDURE field_type( i :CARDINAL ) :FieldType;
+    PROCEDURE field_size( i :CARDINAL ) :FieldSize;
+
+(* ------------------------------------------------------------------------ *)
+(* Metodos generales sobre la base de datos.                                *)
+(* ------------------------------------------------------------------------ *)
+
+    PROCEDURE set_index( index :CARDINAL );
+    PROCEDURE get_index() :CARDINAL;
+
+    PROCEDURE open( name :ARRAY OF CHAR );
+    PROCEDURE create( name :ARRAY OF CHAR );
+    PROCEDURE open_exists( name :ARRAY OF CHAR ) :BOOLEAN;
+    PROCEDURE exists( name :ARRAY OF CHAR ) :BOOLEAN;
+    PROCEDURE close();
+
+    PROCEDURE records() :FM.IndexType;
+
+    PROCEDURE reset();
+    PROCEDURE next( VAR d :ARRAY OF BYTE ) :BOOLEAN;
+    PROCEDURE prev( VAR d :ARRAY OF BYTE ) :BOOLEAN;
+
+    PROCEDURE new( VAR d :ARRAY OF BYTE );
+    PROCEDURE put( VAR o :ARRAY OF BYTE; VAR d :ARRAY OF BYTE );
+    PROCEDURE del( VAR d :ARRAY OF BYTE );
+
+    PROCEDURE set_pos( i :FM.IndexType );
+    PROCEDURE get_pos() :FM.IndexType;
+    PROCEDURE rd_rec( VAR d :ARRAY OF BYTE );
+    PROCEDURE wr_rec( VAR d :ARRAY OF BYTE );
+
+    PROCEDURE search( key :ARRAY OF BYTE; VAR data :ARRAY OF BYTE ) :BOOLEAN;
+
+    PROCEDURE copy( VAR _file :Base; name :ARRAY OF CHAR );
+
+    PROCEDURE status() :ErrorType;
+END Base;
+
+END DBMS.
+
+TYPE FieldType = RECORD
+        name   :FieldStr;
+        type   :FieldType;
+        size   :FieldSize;
+        offset :FieldSize;
+     END;
+
+TYPE HeadFile = RECORD
+        id       :FM.IdType;     (* HGS Soft identificador                  *)
+        filetype :FM.ArchType;   (* tipo de archivo                         *)
+        ver      :FM.VerType;    (* versi¢n de la data_file                 *)
+        user_ver :FM.UserVerType;(* versi¢n de los datos grabados (usuario) *)
+        rec_size :FM.SizeType;   (* el tama¤o de los datos guardados        *)
+        encript  :FM.EncriptType;(* si el archivo esta encriptado           *)
+        RdOnPut  :BOOLEAN;       (* if RdOnPut => when "Put" compare        *)
+        open     :BOOLEAN;       (* si el archivo esta abierto              *)
+        sort     :BOOLEAN;       (* si el archivo esta ordenado.            *)
+        pos      :FM.IndexType;  (* posici¢n l¢gica actual.                 *)
+        max      :FM.IndexType;  (* FileSize of file en forma l¢gica.       *)
+        user_def :ARRAY [ 0..31 ] OF BYTE;
+        eoh      :FM.EndOfHead;  (* Fin de la cabecera                      *)
+        fields   :POINTER TO FieldsType;
+     END; (* HeadFile *)
+
+CLASS MDB;
+    index_file :db_mdb.MDB;
+    data_file  :FM.File;
+    file_head  :POINTER TO HeadFile;
+
+    PROCEDURE Init( _name :ARRAY OF CHAR );
+    PROCEDURE SetCreateMode( _on :BOOLEAN );
+    PROCEDURE InitData( _init_rec :InitProc; _size :CARDINAL );
+    PROCEDURE InitIndex( _comp :CompProc; _make :MakeProc; _size :CARDINAL; _dup :BOOLEAN );
+    PROCEDURE SetIndex( _index :CARDINAL );
+    PROCEDURE GetIndex() :CARDINAL;
+    PROCEDURE Done();
+
+    PROCEDURE InitRecord( VAR data :ARRAY OF BYTE );
+    PROCEDURE RecordSize()   :CARDINAL;
+    PROCEDURE IsCreateMode() :BOOLEAN;
+
+    PROCEDURE OpenFile( create :BOOLEAN );
+    PROCEDURE Open();
+    PROCEDURE Create();
+    PROCEDURE Exists() :BOOLEAN;
+    PROCEDURE Close();
+    PROCEDURE Records() :LONGCARD;
+
+    PROCEDURE New( VAR data :ARRAY OF BYTE );
+    PROCEDURE Del( VAR data :ARRAY OF BYTE );
+    PROCEDURE Put( VAR old :ARRAY OF BYTE; VAR data :ARRAY OF BYTE );
+
+    PROCEDURE Reset();
+    PROCEDURE Next() :BOOLEAN;
+    PROCEDURE Prev() :BOOLEAN;
+
+    PROCEDURE FindKey( VAR key :ARRAY OF BYTE ) :BOOLEAN;
+    PROCEDURE FindRec( VAR rec :ARRAY OF BYTE ) :BOOLEAN;
+
+    PROCEDURE SearchKey( VAR key :ARRAY OF BYTE ) :BOOLEAN;
+    PROCEDURE SearchRec( VAR rec :ARRAY OF BYTE ) :BOOLEAN;
+
+    PROCEDURE LastError() :ErrorType;
+
+    PROCEDURE MakeDuplicates( VAR rec :ARRAY OF BYTE ) :BOOLEAN;
+
+END MDB;
+
+END db_hgs.

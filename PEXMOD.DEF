@@ -1,0 +1,9 @@
+DEFINITION MODULE PEXMOD;
+
+IMPORT pdmenu;
+
+PROCEDURE InitMenu( main :BOOLEAN ) :pdmenu.pulldown;
+
+PROCEDURE Procex();
+
+END PEXMOD.

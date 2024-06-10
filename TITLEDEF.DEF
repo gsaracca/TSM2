@@ -1,0 +1,75 @@
+DEFINITION MODULE TitleDef;
+
+IMPORT TM, Nota;
+IMPORT DateTime, FM;
+
+CONST nonameStr = 'sinombre' + '.' + TM.FileExt5;
+
+TYPE InternalType = RECORD
+        save    :BOOLEAN;
+        nameExt :FM.PathStr;
+     END; (* InternalType *)
+
+TYPE  WriteType = ARRAY [ 0..7 ] OF BOOLEAN;
+
+CONST NullMate  = WriteType( FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE );
+      NormMate  = WriteType( TRUE,  TRUE,  TRUE,  TRUE,  TRUE,  TRUE,  TRUE,  FALSE );
+
+TYPE NombreType    = ARRAY [ 0..55 ] OF CHAR;
+     CursoType     = ARRAY [ 0.. 6 ] OF CHAR;
+     NameMateType  = ARRAY [ 0..40 ] OF CHAR;
+     LibroStr      = ARRAY [ 0..11 ] OF CHAR;
+     ComentarioType= ARRAY [ 0..40 ] OF CHAR;
+     MateriaType = RECORD
+         write  :WriteType;
+         curso  :CursoType;
+         nombre :NameMateType;
+         nota   :Nota.NotaType;
+         folio  :CARDINAL;
+         fecha  :DateTime.DateType;
+         libro  :LibroStr;
+         coment :ComentarioType;
+     END; (* MateriaType *)
+     RangoMaterias  = [ 0..79 ];
+     MateriasType   = ARRAY RangoMaterias OF MateriaType;
+     TitleRec5 = RECORD
+         nombre            :ARRAY [ 0..40 ] OF CHAR;
+         lug_y_fecha_nac1  :ARRAY [ 0..52 ] OF CHAR;
+         lug_y_fecha_nac2  :ARRAY [ 0..18 ] OF CHAR;
+         dni               :ARRAY [ 0..10 ] OF CHAR;
+         tit_secund1       :ARRAY [ 0..16 ] OF CHAR;
+         tit_secund2       :ARRAY [ 0..21 ] OF CHAR;
+         expedido_por      :ARRAY [ 0..40 ] OF CHAR;
+         localidad1        :ARRAY [ 0..11 ] OF CHAR;
+         localidad2        :ARRAY [ 0..22 ] OF CHAR;
+         anio_egreso       :ARRAY [ 0.. 4 ] OF CHAR;
+         carrera           :ARRAY [ 0..55 ] OF CHAR;
+         titulo_de         :ARRAY [ 0..55 ] OF CHAR;
+         fecha             :ARRAY [ 0.. 8 ] OF CHAR;
+         plan              :ARRAY [ 0.. 9 ] OF CHAR;
+         materias          :MateriasType;
+        (*
+            Segunda parte del titulo.
+        *)
+         linea_blanco      :ARRAY [ 0..81 ] OF CHAR;
+         anio_de_ingreso   :ARRAY [ 0.. 4 ] OF CHAR;
+         nro_aplazos       :CARDINAL;
+         fecha_egreso      :ARRAY [ 0..29 ] OF CHAR;
+         promedio_gral     :Nota.NotaType;
+         se_extiende_a_los :ARRAY [ 0..15 ] OF CHAR;
+         dias_de           :ARRAY [ 0..10 ] OF CHAR;
+         del_anio          :ARRAY [ 0.. 4 ] OF CHAR;
+         presentado_a      :ARRAY [ 0..50 ] OF CHAR;
+         Internal          :InternalType;
+     END; (* TitleRec5 *)
+     TitleRec3 = TitleRec5;
+     TitleRec4 = TitleRec5;
+     TitleRec  = TitleRec5;
+
+PROCEDURE InitMate( VAR mate :MateriaType );
+PROCEDURE InitTitleRec( VAR tit :TitleRec );
+
+PROCEDURE UpDate3to4( version3 :TitleRec3; VAR version4 :TitleRec4 );
+PROCEDURE UpDate4to5( version4 :TitleRec4; VAR version5 :TitleRec5 );
+
+END TitleDef.

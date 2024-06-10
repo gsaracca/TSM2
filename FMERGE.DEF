@@ -1,0 +1,21 @@
+DEFINITION MODULE fmerge;
+
+IMPORT TM;
+IMPORT FView, KBD;
+
+CLASS alum_file_merge( FView.FileView );
+    tag_records :TM.set_of_card;
+    VIRTUAL PROCEDURE WrItem( i :LONGCARD; VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Select() :KBD.KeyType;
+    VIRTUAL PROCEDURE GetKeyStr( i :CARDINAL; VAR str :ARRAY OF CHAR );
+END alum_file_merge;
+
+CLASS egre_file_merge( FView.FileView );
+    tag_records :TM.set_of_card;
+    VIRTUAL PROCEDURE WrItem( i :LONGCARD; VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Select() :KBD.KeyType;
+    VIRTUAL PROCEDURE GetKeyStr( i :CARDINAL; VAR str :ARRAY OF CHAR );
+END egre_file_merge;
+
+
+END fmerge.

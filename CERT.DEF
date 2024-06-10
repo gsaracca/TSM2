@@ -1,0 +1,9 @@
+DEFINITION MODULE Cert;
+
+IMPORT TM;
+
+TYPE CertificadoType = ( Analitico, Regular );
+
+PROCEDURE Certificados( alum :TM.AlumType; tipo :CertificadoType );
+
+END Cert.

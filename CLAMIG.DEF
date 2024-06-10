@@ -1,0 +1,12 @@
+DEFINITION MODULE ClaMig; (* Clarion Migrate Source *)
+
+IMPORT DateTime;
+
+PROCEDURE AlumToID ( VAR str :ARRAY OF CHAR; val :LONGCARD );
+
+PROCEDURE StrToStr ( VAR str :ARRAY OF CHAR; val :ARRAY OF CHAR );
+PROCEDURE BoolToStr( VAR str :ARRAY OF CHAR; val :BOOLEAN; true, false :ARRAY OF CHAR );
+PROCEDURE DateToStr( VAR str :ARRAY OF CHAR; val :DateTime.DateType );
+PROCEDURE YearToStr( VAR str :ARRAY OF CHAR; val :CARDINAL );
+
+END ClaMig.

@@ -1,0 +1,39 @@
+DEFINITION MODULE Veterinaria;
+
+IMPORT ClassCarreras, TM, DateTime;
+
+TYPE ptrVeterinariaClass = POINTER TO VeterinariaClass;
+CLASS VeterinariaClass( ClassCarreras.CarreraClass );
+
+(* ------------------------------------------------------------------------ *)
+(* Control general para esta Facultad.                                      *)
+(* ------------------------------------------------------------------------ *)
+
+    VIRTUAL PROCEDURE CtrlGeneral( VAR alum :TM.AlumType ) :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Control generico de Cursada y Finales                                    *)
+(* ------------------------------------------------------------------------ *)
+
+    VIRTUAL PROCEDURE IngresoCursada(     plan  :TM.YearType;
+                                          clave :TM.KeyType;
+                                      VAR mates :TM.MateriasType ) :BOOLEAN;
+
+    VIRTUAL PROCEDURE IngresoFinal(     plan  :TM.YearType;
+                                        mate  :TM.NumeroType;
+                                        fecha :DateTime.DateType;
+                                    VAR mates :TM.MateriasType ) :BOOLEAN;
+
+END VeterinariaClass;
+
+VAR pCarrera :ptrVeterinariaClass;
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos generales para PROCTOOLS.                                 *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE GetConvertProcs(     i    :CARDINAL;
+                           VAR disp :ARRAY OF CHAR;
+                           VAR proc :TM.ProcType   ) :BOOLEAN;
+
+END Veterinaria.

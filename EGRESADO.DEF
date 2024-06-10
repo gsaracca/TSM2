@@ -1,0 +1,18 @@
+DEFINITION MODULE Egresados;
+
+FROM FView IMPORT EditMode, FileViewGet;
+
+CLASS EgreClass( FileViewGet );
+    VIRTUAL PROCEDURE WrItem( i :LONGCARD; VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Comp( d1, d2 :CARDINAL ) :BOOLEAN;
+    VIRTUAL PROCEDURE GetKeyStr( index :CARDINAL; VAR s :ARRAY OF CHAR );
+    VIRTUAL PROCEDURE Compare( VAR a, b :ARRAY OF BYTE ) :INTEGER;
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :LONGCARD; VAR d :ARRAY OF BYTE; VAR km :BOOLEAN; mode :EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Listados();
+END EgreClass;
+
+PROCEDURE EgreProc();
+PROCEDURE ExpoEgreProc();
+
+END Egresados.

@@ -1,0 +1,44 @@
+DEFINITION MODULE Current;
+
+PROCEDURE New();
+PROCEDURE Load();
+PROCEDURE Save();
+PROCEDURE SaveAs();
+
+(* ------------------------------------------------------------------------ *)
+(* Exportar datos a mail de Word.                                           *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Export();
+
+(* ------------------------------------------------------------------------ *)
+(* Editar t¡tulo.                                                           *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE EdAlumno();
+PROCEDURE EdMaterias();
+
+(* ------------------------------------------------------------------------ *)
+(* Imprimir T¡tulo.                                                         *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Print1();
+PROCEDURE Print2();
+PROCEDURE Print3();
+PROCEDURE Print4();
+PROCEDURE PrintAll();
+
+(* ------------------------------------------------------------------------ *)
+(* Procedimientos de conversi¢n de formatos.                                *)
+(* ------------------------------------------------------------------------ *)
+
+PROCEDURE Convert34();
+PROCEDURE Convert45();
+
+PROCEDURE ConvertF2();
+
+PROCEDURE Exit();
+
+PROCEDURE GetAlum();
+
+END Current.

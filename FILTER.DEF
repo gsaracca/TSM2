@@ -1,0 +1,20 @@
+DEFINITION MODULE Filter;
+
+IMPORT TM, db_net;
+
+PROCEDURE IsAlum( VAR alum :TM.AlumType     ) :BOOLEAN;
+PROCEDURE IsEgre( VAR egre :TM.EgresadoType ) :BOOLEAN;
+
+PROCEDURE Edit() :BOOLEAN;
+
+(* ------------------------------------------------------------------------ *)
+(* Implementaci¢n de ¡ndices para acelerar la b£squeda de datos.            *)
+(* ------------------------------------------------------------------------ *)
+
+CONST EOF = MAX(LONGCARD);
+
+PROCEDURE OpenNDX( d_file :db_net.BaseNDX );
+PROCEDURE ReadNDX() :LONGCARD;
+PROCEDURE CloseNDX();
+
+END Filter.

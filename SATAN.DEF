@@ -1,0 +1,13 @@
+DEFINITION MODULE Satan;
+
+IMPORT TM;
+
+TYPE SATANID   = LONGCARD;
+
+PROCEDURE SatanID( DNI :TM.DNIType; carrera :TM.RangoCarreras ) :SATANID;
+PROCEDURE AddSatan( id :SATANID; pointer :LONGCARD );
+PROCEDURE SortSatan();
+PROCEDURE SearchSatan( id :SATANID; VAR pointer :LONGCARD ) :BOOLEAN;
+
+END Satan.
+

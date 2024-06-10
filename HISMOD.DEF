@@ -1,0 +1,5 @@
+DEFINITION MODULE HisMod;
+
+PROCEDURE HisProc();
+
+END HisMod.

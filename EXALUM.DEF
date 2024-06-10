@@ -1,0 +1,21 @@
+DEFINITION MODULE ExAlum;
+
+IMPORT TM;
+IMPORT Editor;
+
+CONST NoHayFinalLibre = 'No hay lugar para un final m s';
+      NoTieneMateria  = 'El alumno no tiene la materia';
+
+VAR global_acta :TM.ActaType;
+    global_ok   :BOOLEAN;
+
+CLASS EdAlum( Editor.Editar );
+    VIRTUAL PROCEDURE Del();
+    VIRTUAL PROCEDURE InitVal( i :CARDINAL );
+    VIRTUAL PROCEDURE Assign( target, source :CARDINAL );
+    VIRTUAL PROCEDURE Print();
+    VIRTUAL PROCEDURE Edit() :BOOLEAN;
+    VIRTUAL PROCEDURE WrMethod( i :LONGCARD );
+END EdAlum;
+
+END ExAlum.

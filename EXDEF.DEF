@@ -1,0 +1,39 @@
+DEFINITION MODULE ExDef;
+
+IMPORT TM;
+
+FROM FView IMPORT FileView, EditMode;
+
+PROCEDURE CountAlum( alum :TM.AlumnosType ) :CARDINAL;
+
+CLASS File( FileView );
+
+    VIRTUAL PROCEDURE Comp( d1, d2 :CARDINAL ) :BOOLEAN;
+    (*
+       Utilizado por el algoritmo de Sort.
+    *)
+
+    VIRTUAL PROCEDURE Compare( VAR d1, d2 :ARRAY OF BYTE ) :INTEGER;
+    (*
+       Utilizado por el algoritmo de Busqueda Binaria.
+    *)
+
+    VIRTUAL PROCEDURE GetKeyStr( i :CARDINAL; VAR s :ARRAY OF CHAR );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :LONGCARD; VAR d :ARRAY OF BYTE; VAR km :BOOLEAN; mode :EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Delete() :BOOLEAN;
+    VIRTUAL PROCEDURE SearchKey( ch :CHAR );
+    VIRTUAL PROCEDURE Search();
+    VIRTUAL PROCEDURE Listados();
+
+    VIRTUAL PROCEDURE WrItem( i :LONGCARD; VAR d :ARRAY OF BYTE );
+
+    PROCEDURE Trans();
+    PROCEDURE PrintActa     ( val :BOOLEAN );
+    PROCEDURE PrintExtendida( val :BOOLEAN );
+    PROCEDURE Refresh();
+
+END File;
+
+
+END ExDef.

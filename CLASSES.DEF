@@ -1,0 +1,289 @@
+(* Copyright (C) 1991-1992 Clarion Software Corporation *)
+
+(*зддддддддддддддддддддддддддддддддддддддд©
+  Ё TopSpeed Example CLASS Library        Ё
+  Ё                                       Ё
+  Ё Basic Collection CLASSes              Ё
+  Ё                                       Ё
+  Ё See CLASSLib.DOC FOR further details  Ё
+  юддддддддддддддддддддддддддддддддддддддды
+*)
+
+DEFINITION MODULE Classes;
+
+(* Pointer types *)
+TYPE
+  Obj              = POINTER TO ObjClass;
+  ListElem         = POINTER TO ListElemClass;
+  TreeElem         = POINTER TO TreeElemClass;
+  HashElem         = POINTER TO HashElemClass;
+  List             = POINTER TO ListClass;
+  Stack            = POINTER TO StackClass;
+  Queue            = POINTER TO QueueClass;
+  Vector           = POINTER TO VectorClass;
+  Matrix           = POINTER TO MatrixClass;
+  Tree             = POINTER TO TreeClass;
+  HashTable        = POINTER TO HashTableClass;
+  ActionProc       = PROCEDURE ( Obj , ADDRESS);
+  Key              = ADDRESS;
+  CompareFunc      = PROCEDURE ( Obj, Obj ) :INTEGER;
+  Container        = POINTER TO ContainerClass;
+
+CONST
+  StackElem        ::= ListElem;
+  QueueElem        ::= ListElem;
+
+(*
+  зддддддддддддддддддддддддддддддддддд©
+  Ё Base Object CLASS                 Ё
+  юддддддддддддддддддддддддддддддддддды
+*)
+
+CLASS ObjClass;
+  VIRTUAL PROCEDURE SubDispose;
+  VIRTUAL PROCEDURE Copy() :Obj;
+  VIRTUAL PROCEDURE SelfSize() :CARDINAL;
+  VIRTUAL PROCEDURE SelfAdr () :ADDRESS;
+END ObjClass;
+
+
+(*
+ зддддддддддддддддддддддддддддддддддд©
+ Ё Base Container CLASS              Ё
+ юддддддддддддддддддддддддддддддддддды
+*)
+
+CLASS ContainerClass( ObjClass );
+  Count : CARDINAL;
+  VIRTUAL PROCEDURE Empty() : BOOLEAN;
+  VIRTUAL PROCEDURE SubDispose;
+  VIRTUAL PROCEDURE ForEach( a :ActionProc; link :ADDRESS ); (* Implemented by Client *)
+  VIRTUAL PROCEDURE Contains( e :Obj ) :BOOLEAN;             (* Implemented by Client *)
+END ContainerClass;
+
+(*
+  зддддддддддддддддддддддддддддддддддд©
+  Ё List CLASS                        Ё
+  юддддддддддддддддддддддддддддддддддды
+*)
+
+CLASS ListElemClass( ObjClass );
+  Next : ListElem;
+  Prev : ListElem;
+END ListElemClass;
+
+CLASS ListClass( ContainerClass );
+  First   :ListElem;
+  Last    :ListElem;
+
+  VIRTUAL PROCEDURE Append  (e : ListElem);
+  VIRTUAL PROCEDURE Insert  (e : ListElem);
+  VIRTUAL PROCEDURE InsertBefore (pos,e: ListElem);
+  VIRTUAL PROCEDURE AppendAfter  (pos,e: ListElem);
+
+  VIRTUAL PROCEDURE Remove  (e : ListElem);
+
+  VIRTUAL PROCEDURE Sort    (Comp : CompareFunc) ;
+
+  VIRTUAL PROCEDURE ForEach ( a :ActionProc; link :ADDRESS );
+  VIRTUAL PROCEDURE Merge   ( c :List);
+  VIRTUAL PROCEDURE Copy    () :Obj;
+  VIRTUAL PROCEDURE Contains( e :Obj ) :BOOLEAN;
+END ListClass;
+
+
+(*
+ зддддддддддддддддддддддддддддддддддд©
+ Ё Stack CLASS                       Ё
+ юддддддддддддддддддддддддддддддддддды
+*)
+
+CONST
+  StackElemCLASS   ::= ListElemClass;
+
+CLASS StackClass( ListClass );
+  Push = ListClass.Insert;
+  PROCEDURE Pop (): StackElem;
+END StackClass;
+
+(*
+ зддддддддддддддддддддддддддддддддддд©
+ Ё Queue CLASS                       Ё
+ юддддддддддддддддддддддддддддддддддды
+*)
+
+CONST QueueElemCLASS ::= ListElemClass;
+
+CLASS QueueClass( ListClass );
+
+  Enqueue = ListClass.Append;
+  PROCEDURE Dequeue (): QueueElem;
+
+END QueueClass;
+
+(*зддддддддддддддддддддддддддддддддддд© 
+ Ё Vector CLASS                      Ё
+ юддддддддддддддддддддддддддддддддддды
+*)
+
+CLASS VectorClass( ContainerClass );
+
+  _Data     : ADDRESS;
+  _VESize   : CARDINAL;
+  _VEObj    : BOOLEAN;
+
+  Low       : CARDINAL;
+  High      : CARDINAL;
+
+  PROCEDURE Get(index:CARDINAL; VAR el :ARRAY OF BYTE );
+  PROCEDURE Put(index:CARDINAL; el :ARRAY OF BYTE);
+  PROCEDURE Ptr(index:CARDINAL):ADDRESS;
+
+  PROCEDURE Init( lowi,highi : CARDINAL;
+                         elemsize : CARDINAL);
+                         (* elemsize = 0 IF vector OF objects *)
+
+  VIRTUAL PROCEDURE  Copy() :Obj;
+
+  (* The following are only FOR vectors OF objects *)
+  VIRTUAL PROCEDURE ForEach (a : ActionProc; link:ADDRESS);
+  VIRTUAL PROCEDURE Contains(e : Obj):BOOLEAN;
+END VectorClass;
+
+(*
+ зддддддддддддддддддддддддддддддддддд©
+ Ё Matrix CLASS                      Ё
+ юддддддддддддддддддддддддддддддддддды
+*)
+
+CLASS MatrixClass( VectorClass );
+
+  LowRow     = VectorClass.Low;
+  HighRow    = VectorClass.High;
+  LowColumn  : CARDINAL;
+  HighColumn : CARDINAL;
+
+  _MESize    : CARDINAL;
+  _MEObj     : BOOLEAN;
+
+  PROCEDURE Get(row,column:CARDINAL; VAR el :ARRAY OF BYTE);
+  PROCEDURE Put(row,column:CARDINAL; el :ARRAY OF BYTE);
+  PROCEDURE  Ptr(row,column:CARDINAL):ADDRESS;
+
+  VIRTUAL PROCEDURE  Copy() :Obj;
+
+  PROCEDURE Init( lowr,highr : CARDINAL;
+                         lowc,highc : CARDINAL;
+                         elemsize : CARDINAL);
+                         (* esize = 0 IF matrix OF objects *)
+
+  VIRTUAL PROCEDURE  Contains(e : Obj):BOOLEAN; (* only FOR matrices OF objects *)
+
+
+END MatrixClass;
+
+(*
+ зддддддддддддддддддддддддддддддддддд©
+ Ё Binary Tree CLASS                 Ё
+ юддддддддддддддддддддддддддддддддддды
+*)
+
+CLASS TreeElemClass( ObjClass );
+
+  Left,Right : TreeElem;
+
+  VIRTUAL PROCEDURE Compare (k : Key):INTEGER ;  (* < 0 IF self.key < k *)
+                                       (* = 0 IF self.key = k *)
+                                       (* > 0 IF self.key > k *)
+  VIRTUAL PROCEDURE GetKey():Key;
+
+
+END TreeElemClass;
+
+CLASS TreeClass( ContainerClass );
+
+  Root: TreeElem;
+
+  VIRTUAL PROCEDURE Insert  (e : TreeElem);
+  VIRTUAL PROCEDURE Find    (k : Key):TreeElem;
+  VIRTUAL PROCEDURE Delete  (k : Key):TreeElem;
+  VIRTUAL PROCEDURE ForEach (a : ActionProc; link:ADDRESS);
+  VIRTUAL PROCEDURE Copy() :Obj;
+  VIRTUAL PROCEDURE Merge   (c : Tree);
+  VIRTUAL PROCEDURE Contains(e : Obj):BOOLEAN;
+
+END TreeClass;
+
+(*
+ зддддддддддддддддддддддддддддддддддд©
+ Ё Dynamic Hash Table CLASS          Ё
+ юддддддддддддддддддддддддддддддддддды
+*)
+
+CLASS HashElemClass( ObjClass );
+
+  HashVal : CARDINAL;
+
+  VIRTUAL PROCEDURE Eq (k : Key):BOOLEAN;
+  VIRTUAL PROCEDURE GetKey ():Key;
+
+END HashElemClass;
+
+CLASS HashTableClass( ContainerClass );
+
+  HTSize: CARDINAL;        	(* size OF hashtab *)
+  HTPtr:  ADDRESS;          (* pointer TO hash ARRAY *)
+
+  VIRTUAL PROCEDURE Insert  (e : HashElem);
+  VIRTUAL PROCEDURE Find    (k : Key):HashElem;
+  VIRTUAL PROCEDURE Delete  (k : Key):HashElem;
+  VIRTUAL PROCEDURE ForEach (a : ActionProc; link:ADDRESS);
+  VIRTUAL PROCEDURE Merge   (c : HashTable);
+  VIRTUAL PROCEDURE Copy ()   : Obj;
+  VIRTUAL PROCEDURE SubDispose;
+  VIRTUAL PROCEDURE Contains(e : Obj):BOOLEAN;
+
+  VIRTUAL PROCEDURE HashKey (k : Key) :CARDINAL; (* Implemented by Client *)
+
+END HashTableClass;
+
+(*
+ зддддддддддддддддддддддддддддддддддд©
+ Ё Exception Handler CLASS           Ё
+ юддддддддддддддддддддддддддддддддддды
+*)
+
+TYPE Exception = POINTER TO ExceptionClass;
+
+CLASS ExceptionClass;
+  code       : CARDINAL;
+  first      : Exception;
+  next       : Exception;
+
+(*#save,call(result_optional=>on)*)
+  VIRTUAL PROCEDURE Raise(err : CARDINAL):BOOLEAN;
+(*#restore*)
+  VIRTUAL PROCEDURE	Handler():BOOLEAN;
+  VIRTUAL PROCEDURE ChainTo(e : Exception);
+  VIRTUAL PROCEDURE Unchain;
+
+END ExceptionClass;
+
+VAR
+  CLASSException : Exception;  (* Exception handler FOR this module *)
+
+CONST
+  (*CLASS exception constants*)
+  CE_ok                                 = 0;
+  CE_heap_full                          = 1;
+  CE_deferred_foreach                   = 2;
+  CE_deferred_contains                  = 3;
+  CE_vector_index                       = 4;
+  CE_deferred_treeelemCLASS_compare     = 5;
+  CE_deferred_treeelemCLASS_getkey      = 6;
+  CE_max_hash_table                     = 7;
+  CE_deferred_hashelemCLASS_eq          = 8;
+  CE_deferred_hashelemCLASS_getkey      = 9;
+  CE_deferred_hashtableCLASS_hashkey    = 10;
+
+END Classes.

@@ -1,0 +1,53 @@
+DEFINITION MODULE MM; (* Manager de Materias *)
+
+FROM FView  IMPORT EditMode, FileViewDOS;
+FROM db_dos IMPORT DosFile;
+IMPORT TM, FM;
+
+CLASS MMFile( DosFile );  (* Agregado el: 21-06-94 *)
+    PROCEDURE Init( Carr :TM.CarreraType; key :TM.KeyType );
+    (*
+        Selecciona una "materia" y un "a¤o" a en el cual realizar las
+        operaciones subsecuentes.
+        Abre del Disco el Archivo Correspondiente.
+        Los Archivos de Encuentran en el subdirectorio: "carrXX\mtNNprPP.dYY"
+    *)
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Comp( d1, d2 :ARRAY OF BYTE ) :BOOLEAN;
+    VIRTUAL PROCEDURE GetKeyStr( i :FM.IndexType; VAR s :ARRAY OF CHAR );
+    PROCEDURE GetIndex( al :TM.CurMateType; VAR index :FM.IndexType ) :BOOLEAN;
+    PROCEDURE DelAlumno( al :TM.CurMateType );
+END MMFile;
+
+PROCEDURE HacerDirectorio( VAR dir  :ARRAY OF CHAR; Carr :TM.CarreraType );
+PROCEDURE HacerMateria( Carr :TM.CarreraType; key :TM.KeyType;
+                        VAR file :ARRAY OF CHAR );
+(*
+   Dada una carrera devuelve el directorio donde se encuentran las materias.
+*)
+
+PROCEDURE InitDirs();   (* Agregado el : 21-03-94 *)
+                        (* Crea los directorios de las materias *)
+
+PROCEDURE GenMates();   (* Agregado el : 22-03-94     *)
+                        (* Transferido de ProcalTools *)
+(*
+   Genera los punteros a las materias a partir de los alumnos.
+*)
+
+CLASS MateClass( FileViewDOS );
+    carrera   :TM.CarreraType;
+    file_name :FM.PathStr;      (* nombre del archivo. *)
+    key_mate  :TM.KeyType;
+    PROCEDURE Init( Carr :TM.CarreraType; key :TM.KeyType );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE WrItem( i :LONGCARD; VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Comp( d1, d2 :ARRAY OF BYTE ) :BOOLEAN;
+    VIRTUAL PROCEDURE GetKeyStr( index :FM.IndexType; VAR s :ARRAY OF CHAR );
+    VIRTUAL PROCEDURE Editar( i :LONGCARD; VAR d :ARRAY OF BYTE; VAR km :BOOLEAN; mode :EditMode ) :BOOLEAN;
+    PROCEDURE Trans();
+    PROCEDURE Execute();
+    VIRTUAL PROCEDURE Listados();
+END MateClass;
+
+END MM.

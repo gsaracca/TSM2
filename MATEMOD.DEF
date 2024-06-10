@@ -1,0 +1,5 @@
+DEFINITION MODULE MateMod;
+
+PROCEDURE MateProc();
+
+END MateMod.

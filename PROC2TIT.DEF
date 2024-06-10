@@ -1,0 +1,9 @@
+DEFINITION MODULE Proc2Tit;
+
+IMPORT TitleDef, TM;
+
+PROCEDURE ConvertPR(     old_alum :TM.AlumType;
+                         title    :TM.TituloRange;
+                     VAR NewAlum  :TitleDef.TitleRec );
+
+END Proc2Tit.

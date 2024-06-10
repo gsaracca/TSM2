@@ -1,0 +1,24 @@
+DEFINITION MODULE Hist;
+
+FROM FView IMPORT EditMode, indexType, FileViewGet;
+
+CONST file_name = 'doc_hist';
+
+CLASS SearchHist( FileViewGet );
+    SearchComplete :BOOLEAN;
+    VIRTUAL PROCEDURE WrItem( i :CARDINAL );
+    VIRTUAL PROCEDURE Comp( d1, d2 :indexType ) :BOOLEAN;
+    VIRTUAL PROCEDURE GetKeyStr( index :indexType; VAR s :ARRAY OF CHAR );
+    VIRTUAL PROCEDURE CompData( VAR d1 :ARRAY OF BYTE;
+                                    d2 :indexType ) :INTEGER;
+    VIRTUAL PROCEDURE Compare( VAR a, b :ARRAY OF BYTE ) :INTEGER;
+END SearchHist;
+
+TYPE ptrHist = POINTER TO HistClass;
+CLASS HistClass( SearchHist );
+    VIRTUAL PROCEDURE InitData( VAR d :ARRAY OF BYTE );
+    VIRTUAL PROCEDURE Editar( i :CARDINAL; VAR d :ARRAY OF BYTE; mode :EditMode ) :BOOLEAN;
+    VIRTUAL PROCEDURE Listados();
+END HistClass;
+
+END Hist.
